@@ -1,0 +1,2 @@
+const eightdata='<!DOCTYPE html><html><head><meta charset="utf-8"><title>菜鸟教程(runoob.com)</title></head><body><div class="TRS_Editor">    <h3 align="center">第八章　团旗、团徽、团歌</h3 ><p align="justify">第三十七条中国共产主义青年团团旗旗面为红色，象征革命胜利；左上角缀黄色五角星，周围环绕黄色圆圈，象征中国青年一代紧密团结在中国共产党周围。</p><p align="justify">第三十八条中国共产主义青年团团徽的内容为团旗、齿轮、麦穗、初升的太阳及其光芒，写有“中国共青团”五字的绶带。它象征着共青团在马克思列宁主义、毛泽东思想的光辉照耀下，团结各族青年，朝着党所指引的方向奋勇前进。</p><p align="justify">第三十九条中国共产主义青年团团歌为《光荣啊，中国共青团》。</p><p align="justify">第四十条中国共产主义青年团的团旗、团徽、团歌是中国共产主义青年团的象征和标志。要按照规定制作和使用团旗、团徽、团歌。</p></div></body></html>'
+export default eightdata

@@ -1,0 +1,31 @@
+html, body, div, ul, li, h1, h2,  h4, h5, h6, p, dl, dt, dd, ol, form, input, textarea, th, td, select {
+    margin: 0;
+    padding: 0;
+}
+.bgc{
+    height: 600px;
+    background: url("http://ywj.10085.cn/ngqss/assets/img/home-bg_6fe9e55e.png") no-repeat center 80%;
+}
+.bgc .title{
+         text-align: center;
+         /* margin-top: 20px; */
+         padding-top: 80px;
+         margin-bottom: 20px;
+}
+.bgc .title img{
+         /* vertical-align: middle; */
+         width: 65px;
+         height: 65px;
+}
+.bgc .title span{
+         vertical-align: middle;
+         font:italic bold 24px Georgia,serif;
+}
+.bgc .content{
+         width: 400px;
+         margin: 0 auto;
+         text-align: center;
+         border:1px solid #ddd;
+         padding:22px 33px;
+         box-shadow: 0 2px 16px 0 #e7e7e7;
+}

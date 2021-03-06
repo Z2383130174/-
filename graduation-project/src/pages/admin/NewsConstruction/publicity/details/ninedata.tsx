@@ -1,0 +1,2 @@
+const ninedata='<!DOCTYPE html><html><head><meta charset="utf-8"><title>菜鸟教程(runoob.com)</title></head><body><div class="TRS_Editor"><h3 align="center">第九章　团的经费</h3><p align="justify">第四十一条团的经费来源主要是：团员交纳的团费、党和政府以及企事业单位关于青少年事业的经费和团的工作经费、正当的社会资助和团组织的其它合法收入。</p><p align="justify">第四十二条团费的交纳和管理使用办法由中央委员会统一规定。</p></div></body></html>'
+export default ninedata

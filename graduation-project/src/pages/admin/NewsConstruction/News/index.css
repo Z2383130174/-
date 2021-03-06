@@ -1,0 +1,181 @@
+.news .card-container p {
+  margin: 0;
+}
+
+.news .card-container>.ant-tabs-card .ant-tabs-content {
+  height: 1050px;
+  margin-top: -16px;
+}
+
+.news .card-container>.ant-tabs-card .ant-tabs-content>.ant-tabs-tabpane {
+  padding: 16px;
+  background: #fff;
+}
+
+.news .card-container>.ant-tabs-card>.ant-tabs-nav::before {
+  display: none;
+}
+
+.news .card-container>.ant-tabs-card .ant-tabs-tab,
+[data-theme='compact'] .card-container>.ant-tabs-card .ant-tabs-tab {
+  background: transparent;
+  border-color: transparent;
+}
+
+.news .card-container>.ant-tabs-card .ant-tabs-tab-active,
+[data-theme='compact'] .card-container>.ant-tabs-card .ant-tabs-tab-active {
+  background: #fff;
+  border-color: #fff;
+}
+
+.news #components-tabs-demo-card-top .code-box-demo {
+  padding: 24px;
+  overflow: hidden;
+  background: #f5f5f5;
+}
+
+[data-theme='compact'] .card-container>.ant-tabs-card .ant-tabs-content {
+  height: 1050px;
+  margin-top: -8px;
+}
+
+[data-theme='dark'] .card-container>.ant-tabs-card .ant-tabs-tab {
+  background: transparent;
+  border-color: transparent;
+}
+
+[data-theme='dark'] #components-tabs-demo-card-top .code-box-demo {
+  background: #000;
+}
+
+[data-theme='dark'] .card-container>.ant-tabs-card .ant-tabs-content>.ant-tabs-tabpane {
+  background: #141414;
+}
+
+[data-theme='dark'] .card-container>.ant-tabs-card .ant-tabs-tab-active {
+  background: #141414;
+  border-color: #141414;
+}
+.news ul{
+  margin-top: 35px;
+}
+.news ul li {
+  float: left;
+  list-style: none;
+  width: 280px;
+  height: 330px;
+  margin-right: 20px;
+  margin-bottom: 20px;
+  padding: 0;
+  border: none;
+  position: relative;
+  background-color: #f0f2f5;
+}
+.news  ul li.lastLi{
+  margin-right: 0;
+} 
+.news ul li .image{
+  margin: 0px;
+  min-height: 280px
+}
+.news ul li .image img{
+  width: 100%;
+  height: 100%;
+}
+.news ul li .image a{
+text-decoration: none;
+color: #333333;  
+font-size: 16px;
+}
+.news ul li .image a:hover{ color:purple}
+
+.news ul li .image .text{
+  padding: 14px 14px 14px 17px;
+  width: 285px;
+}
+
+.news ul li .image .bottom {
+  margin: 30px 14px 0 17px;
+  position: absolute;
+  bottom: 18px;
+  height: 54px;
+  width: 255px !important;
+}
+.news ul li .image .bottom .keyword {
+position: absolute;
+left: 1px;
+top: 0;
+margin-right: 7px;
+height: 25px;
+width: 208px;
+overflow: hidden;
+}
+.news ul li .image .bottom .keyword a{
+margin-right: 13px;
+color: #999999;
+}
+.news ul li .image .bottom .date{
+margin-top: 43px;
+display: inline-block;
+font-family: arial; 
+margin-left: 1px;
+color: #999999;
+}
+.news ul li .image .bottom .share{
+  margin-top: 43px;
+  height: 21px;
+  width: 130px;
+  float: right;
+  position: relative
+}
+
+.news ul li .image .bottom .share a{
+height: 21px;
+width: 21px;
+display: inline-block;
+background-image: url(//p1.img.cctvpic.com/photoAlbum/templet/common/DEPA1561603549108607/share_kap_XUQIU-18886.png);
+background-repeat: no-repeat;
+margin-right: 5px;
+}
+
+.news ul li .image .bottom .share a.weixin{
+  position: relative;
+}
+.news ul li .image .bottom .share a.weixin:hover::after {
+  content: "";
+  background-image: url(./1.jpg);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  position: absolute;
+  right: -40px;
+  top: -103px;
+  width: 100px;
+  height: 100px;
+}
+
+
+.news ul li .image .bottom .share a.qq{
+  background-position: -78px 0;
+}
+.news ul li .image .bottom .share a.qq:hover::after {
+    content: "";
+    background-image: url(./2.jpg);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    position: absolute;
+    right: 45px;
+    top: -103px;
+    width: 100px;
+    height: 100px;
+  }
+.FormLabelStyle:before{
+    display: inline-block;
+    margin-right: 4px;
+    color: #ff4d4f;
+    font-size: 14px;
+    font-family: SimSun,sans-serif;
+    line-height: 1;
+    content: "*";
+}
+
+

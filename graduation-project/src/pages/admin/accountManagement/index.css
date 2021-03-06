@@ -1,0 +1,19 @@
+.user .ant-input-borderless{
+    text-align:center;
+}
+.user .ant-input-affix-wrapper > input.ant-input{
+    padding-left:18px
+}
+.user .inputPassword .ant-input-affix-wrapper > input.ant-input{
+    padding-left:0px
+}
+.FormLabelStyle:before{
+    display: inline-block;
+    margin-right: 4px;
+    color: #ff4d4f;
+    font-size: 14px;
+    font-family: SimSun,sans-serif;
+    line-height: 1;
+    content: "*";
+}
+
