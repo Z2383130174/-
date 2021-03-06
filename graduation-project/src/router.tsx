@@ -57,7 +57,7 @@ export const adminRoutes = [{
     {
         path: '/admin/NewsConstruction/News/NewsDetails',
         component: NewsDetails,
-        isShow: true,
+        isShow: false,
         title: '新闻详情',
         icon:"iconxinwen",
     },
