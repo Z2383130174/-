@@ -547,7 +547,7 @@ export default class New extends Component<IProps, IState>{
                                      <img src={ newsTwo} alt=""
                                          style={{
                                              height: '300px',
-                                         }}/>
+                                         }}/> 
                                     </div>  <div>
                                      <img src={newsThree} alt=""
                                          style={{
