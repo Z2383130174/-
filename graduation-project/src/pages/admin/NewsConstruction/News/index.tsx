@@ -558,7 +558,7 @@ export default class New extends Component<IProps, IState>{
                                          style={{
                                              height: '300px',
                                          }}/>
-                                    </div>
+                                    </div>  
                                 </Carousel> 
                              {this.state.homenewsData.map((item:any,index:number) => (
                                         (index+1) %4===0 ? <ul>
