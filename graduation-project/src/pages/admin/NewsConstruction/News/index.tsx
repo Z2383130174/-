@@ -13,7 +13,8 @@ import newsFour from './6.jpg'
 import './index.css'
 const { TabPane } = Tabs;
 interface IProps {
-    history:any
+    history: any,
+    location:any
 }
 
 interface IState {
@@ -22,7 +23,8 @@ interface IState {
     arr: any
     homenewsData: any,
     homeisModalVisible: boolean,
-    homearr:any
+    homearr: any,
+    tabKey:string
 }
 const IconFont = createFromIconfontCN({
     scriptUrl: [
@@ -33,6 +35,7 @@ export default class New extends Component<IProps, IState>{
     constructor(props: IProps) {
         super(props)
         this.state = {
+            tabKey:'1',
             isModalVisible: false,
             arr: {
                 title: '',
@@ -54,6 +57,11 @@ export default class New extends Component<IProps, IState>{
         }
     }
     componentDidMount() {
+        if (this.props.location.url) {
+            this.setState({
+                tabKey:this.props.location.url.list
+            })
+        }       
         this.getNews();
         this.homegetNews()
     }
@@ -61,10 +69,7 @@ export default class New extends Component<IProps, IState>{
         axios.post("http://www.test.com/news/Abroad/select.php").then((res: any) => {
             if (res.data.code === 200) {
                 this.setState({
-                    newsData: res.data.data.data
-                }, () => {
-                    console.log(this.state.newsData);
-                    
+                    newsData: res.data.data.data        
                 })
             }
         }).catch((err)=> {
@@ -308,20 +313,27 @@ export default class New extends Component<IProps, IState>{
     }
     public newsHttp = (index:number) => {
         let arr=this.state.newsData[index]
-        this.props.history.push({ pathname: '/admin/NewsConstruction/News/NewsDetails', url: {url:arr.newsAddress}})
+        this.props.history.push({ pathname: '/admin/NewsConstruction/News/NewsDetails', url: {url:arr.newsAddress,list:1}})
     }
     public homenewsHttp = (index:number) => {
         let arr=this.state.homenewsData[index]
-        this.props.history.push({ pathname: '/admin/NewsConstruction/News/NewsDetails', url: {url:arr.newsAddress}})
+        this.props.history.push({ pathname: '/admin/NewsConstruction/News/NewsDetails', url: {url:arr.newsAddress,list:2}})
     }
     public keywordClick = (ite:any) => {
         let url = "https://search.cctv.com/search.php?qtext=" + ite
-        this.props.history.push({ pathname: '/admin/NewsConstruction/News/NewsDetails', url: {url:url}})
+        this.props.history.push({ pathname: '/admin/NewsConstruction/News/NewsDetails', url: {url:url,list:1}})
     }
     public homekeywordClick = (ite:any) => {
         let url = "https://search.cctv.com/search.php?qtext=" + ite
-        this.props.history.push({ pathname: '/admin/NewsConstruction/News/NewsDetails', url: {url:url}})
+        this.props.history.push({ pathname: '/admin/NewsConstruction/News/NewsDetails', url: {url:url,list:2}})
     }
+    public tabKeyChange = (activeKey:any) => {
+        this.setState({
+            tabKey:activeKey
+        })
+        
+    }
+    
     render() {
         const addStyle = {
             style: {  width: "80%",
@@ -331,7 +343,7 @@ export default class New extends Component<IProps, IState>{
          return (
                 <div className="news">
                      <div className="card-container">
-                <Tabs type="card">
+                     <Tabs type="card" activeKey={this.state.tabKey} onChange={ this.tabKeyChange}>
                             <TabPane tab="国外新闻" key="1">
                                 <Carousel autoplay effect="fade" >
                                  <div>
