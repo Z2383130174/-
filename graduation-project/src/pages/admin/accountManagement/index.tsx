@@ -1,7 +1,7 @@
 //用户账号管理组件
 import { Table,message,Space, Modal,Input,Select,Row,Col,Button,Pagination,ConfigProvider, Popconfirm} from 'antd';
 import React, { Component } from 'react'
-import { SettingTwoTone, EditTwoTone, EyeInvisibleOutlined, EyeTwoTone,BulbOutlined } from '@ant-design/icons';
+import { SettingTwoTone, EditTwoTone, EyeInvisibleOutlined, EyeTwoTone,BulbOutlined,SearchOutlined,ReloadOutlined,UserAddOutlined } from '@ant-design/icons';
 import zhCN from 'antd/lib/locale/zh_CN';
 import axios from 'axios'
 import qs from 'qs';
@@ -43,14 +43,16 @@ export default class Login extends Component<IProps, IState>{
             jurisdiction: '',
             limit: 10,
             offset: 0,
-            userSchool:'',
+            userSchool: '',
+            rootname:'',
           },
           //新增修改账号
           userData: {
             id: '',
             password:'',
             jurisdiction: '',
-            userSchool:'',
+            userSchool: '',
+            rootname:'',
           }
         }
   }
@@ -131,7 +133,8 @@ public anyDelete = () => {
               id: '',
               password: '',
               jurisdiction: '',
-              userschoo:'',
+              userschoo: '',
+              rootname:''
             }
           }, () => {
             this.refer()
@@ -159,7 +162,8 @@ public anyDelete = () => {
             id: '',
             password: '',
             jurisdiction: '',
-            userSchool:'',
+            userSchool: '',
+            rootname:''
           }
         }, () => {
           this.refer()
@@ -188,7 +192,8 @@ public anyDelete = () => {
             jurisdiction: '',
             limit: 10,
             offset: 0,
-            userSchool:'',
+            userSchool: '',
+            rootname:'',
       }
     }, () => {
        this.refer()
@@ -299,6 +304,23 @@ public anyDelete = () => {
           console.log(this.state.userData);     
       })
   }
+  //新增修改账号触发事件
+  public rootnameChange= (e: any) => { 
+    let value = e.target.value
+      this.setState({
+        userData: {...this.state.userData,rootname:value}
+      }, () => {
+          console.log(this.state.userData);     
+      })
+  }
+  public ReferrootnameChange= (e: any) => { 
+    let value = e.target.value
+      this.setState({
+        referData: {...this.state.referData,rootname:value}
+      }, () => {
+          console.log(this.state.referData);     
+      })
+  }
   
   //新增修改账号权限下拉框改变
   public selectchange = (value: any) => {
@@ -328,7 +350,8 @@ public anyDelete = () => {
     const reg = /^(?![^a-zA-Z]+$)(?!\D+$)/;
     if (this.state.userData.id&&this.state.userData.id.length > 8) {
       if (this.state.userData.password&&this.state.userData.password.length > 8 &&reg.test(this.state.userData.password)) {
-        if (this.state.userData.jurisdiction && this.state.userData.jurisdiction.length > 0) {
+        if (this.state.userData.rootname&&this.state.userData.rootname.length > 0) {
+          if (this.state.userData.jurisdiction && this.state.userData.jurisdiction.length > 0) {
           if (this.state.userData.userSchool && this.state.userData.userSchool.length > 0) {
             // eslint-disable-next-line no-lone-blocks
             { this.state.title === '新增账号' ? this.addData() : this.updateData() }
@@ -337,6 +360,9 @@ public anyDelete = () => {
           }
         } else {
           message.warning('请选择账号的对应权限');
+          }
+        } else {
+          message.warning('请输入用户的姓名')
         }
       } else { 
         message.warning('密码格式错误，请输入8~20位的密码，且需要同时包含数字和字母');
@@ -353,7 +379,8 @@ public anyDelete = () => {
         id: '',
         password:'',
         jurisdiction: '',
-        userSchool:'',
+        userSchool: '',
+        rootname:''
       },
     })
   }
@@ -404,15 +431,21 @@ public anyDelete = () => {
               title: '序号',
               dataIndex: 'number',
               align: 'center ' as 'center',
-              width:'10%',
+              width:'8%',
               render: (text: any,record:any,index:any) => `${(this.state.pagenumber-1)*this.state.referData.limit+index+1}`,
             },
             {
               title: '账号',
               dataIndex: 'id',
               align: 'center ' as 'center',
-              width:'20%',
-            },
+              width:'18%',
+          },
+          {
+            title: '姓名',
+            dataIndex: 'rootname',
+            align: 'center ' as 'center',
+            width:'10%',
+          },
             {
               title: '密码',
               dataIndex: 'password',
@@ -428,7 +461,7 @@ public anyDelete = () => {
             },         
             {
               title: '权限',
-              width:'20%',
+              width:'15%',
               dataIndex: 'jurisdiction',
               align:'center 'as 'center',
               render: (text: any[]) => (
@@ -467,33 +500,42 @@ public anyDelete = () => {
         ]; 
     return (
       <div className="user">
-            <Row gutter={24} style={{marginBottom:'30px'}}>
-              <Col span={6}><label>账号：</label><Input value={this.state.referData.id} onChange={this.referIdChange} style={{width:'80%'}}></Input></Col>
-          <Col span={6} ><label>权限：</label><Select value={this.state.referData.jurisdiction}
+        <Row gutter={48} style={{ marginBottom: '15px' }}>
+          <Col span={9} style={{
+            marginLeft: '79px',
+            marginBottom:"20px"
+          }}><label>姓名：</label><Input value={this.state.referData.name} onChange={this.ReferrootnameChange} style={{width:'60%'}}></Input></Col>
+          <Col span={9} ><label>权限：</label><Select value={this.state.referData.jurisdiction}
           allowClear   
           style={{
-          width: "80%"
+          width: "60%"
           }}
           onChange={this.referSelectchange}>
         { options.map((item:any,index:any) =>(
           <Option value={item.value} key={index }>{item.label}</Option>
          ))}
           </Select></Col>
-          <Col span={6} ><label>所属团支部：</label><Select value={this.state.referData.userSchool}
+          <Col span={9} style={{
+                  marginLeft: '79px',
+                  marginBottom:"20px"
+          }}><label>账号：</label><Input value={this.state.referData.id} onChange={this.referIdChange} style={{width:'60%'}}></Input></Col>
+          <Col span={9} ><label style={{
+            marginLeft:'-42px'
+          }}>所属团支部：</label><Select value={this.state.referData.userSchool}
           allowClear   
           style={{
-          width: "70%"
+          width: "60%"
           }}
           onChange={this.userChange}>
         { optionSchool.map((item:any,index:any) =>(
        <Option value={ item.value} key={index }>{item.label}</Option>
          ))}
           </Select></Col>
-              <div style={{marginLeft:'120px'}}> 
-              <Button type="primary" onClick={ this.refer}>查询</Button>
-              <Button type="dashed" style={{marginLeft:'50px'}} onClick={ this.reset}>重置</Button></div>
+              <div style={{display:'flex',justifyContent:'flex-end'}}> 
+              <Button type="primary" icon={<SearchOutlined />} style={{marginRight:'50px'}}onClick={ this.refer}>查询</Button>
+              <Button type="dashed" icon={<ReloadOutlined />}   onClick={ this.reset}>重置</Button></div>
             </Row>
-            <Button type="primary" style={{ float: 'right', marginBottom: '10px' }} onClick={this.add}>新增账号</Button>
+        <Button type="primary" icon={ <UserAddOutlined />} style={{ float: 'right', marginBottom: '10px' }} onClick={this.add}>新增账号</Button>
             <Table rowSelection={rowSelection} columns={columns} dataSource={this.state.Data} loading={this.state.loading} rowKey={record => record.list} pagination={false} /> 
         <ConfigProvider locale={zhCN}>
                <Pagination
@@ -576,6 +618,15 @@ public anyDelete = () => {
                     onChange={this.passwordChange}
                     maxLength={20}
                   {...addStyle} ></Input.Password></Col>
+          </Row>
+          <Row>
+                <Col span={18} offset={3}><label className="FormLabelStyle">姓名：</label>
+              <Input
+                value={
+                    this.state.userData.rootname}
+                    onChange={this.rootnameChange}
+                    maxLength={20}
+                  {...addStyle} ></Input></Col>
               </Row>
               <Row>
                 <Col span={18}  offset={3}><label className="FormLabelStyle">权限：</label><Select value={this.state.userData.jurisdiction}

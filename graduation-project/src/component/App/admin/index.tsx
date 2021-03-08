@@ -2,15 +2,13 @@ import React, { Component} from 'react'
 import { Layout, Menu, Dropdown,Avatar, message} from 'antd';
 import { withRouter} from 'react-router-dom'
 import { adminRoutes } from '../../../router'
-import { createFromIconfontCN } from '@ant-design/icons';
-// import { Link } from 'react-router-dom';
-// import { UserOutlined, LaptopOutlined, NotificationOutlined } from '@ant-design/icons';
+import { createFromIconfontCN} from '@ant-design/icons';
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
 const routes=adminRoutes.filter(route=>route.isShow)
 const IconFont = createFromIconfontCN({
   scriptUrl: [
-"//at.alicdn.com/t/font_1999223_iwovvyhxqdk.js"
+"//at.alicdn.com/t/font_1999223_1bhohl4vo1w.js"
   ], 
 });
 
@@ -35,7 +33,7 @@ interface IState {
    componentDidMount() {
      if (this.props.location.root) { 
           this.setState({
-       root:this.props.location.root.jurisdiction
+          root:this.props.location.root
      })
     }
    }
@@ -43,16 +41,30 @@ interface IState {
     this.setState({ collapsed });
    };
    render() {
-     const popMenus = (<Menu onClick={(item:any) => { 
-       if (item.key === "out") { 
+     const popMenus = (<Menu onClick={(item:any) => {
+       if (item.key === "out") {
          this.props.history.push("/login")
-       } else {
-         message.warning('item.key')
+       } else if (item.key === "personage") {
+         message.warning('打开活动中心')
+       } else if (item.key === "revamp") {
+         message.warning('修改密码')
        }
      }}>
-       <Menu.Item key="xinxi">个人中心</Menu.Item>
-       {/* <Menu.Item key="setting">设置</Menu.Item> */}
-       <Menu.Item key="out">退出</Menu.Item>
+       <Menu.Item key="personage" style={{
+       fontSize: "15px",
+     }}><IconFont type="iconUser" style={{
+      fontSize: "15px",
+    }}/>个人中心</Menu.Item>
+       <Menu.Item key="revamp" style={{
+       fontSize: "15px",
+     }}><IconFont type="iconedit" style={{
+      fontSize: "15px",
+    }}/>修改密码</Menu.Item>
+       <Menu.Item key="out" style={{
+       fontSize: "15px",
+     }}><IconFont type="iconsignout" style={{
+      fontSize: "15px",
+    }}/>退出</Menu.Item>
      </Menu>)
     return (
       <Layout style={{ minHeight: '100vh' }}>
@@ -60,26 +72,24 @@ interface IState {
           height: '60px',
           overflow: "hidden",
 }}>
-    <Header className="header" style={{textAlign:'center',backgroundColor:'#320f38',position:'fixed',zIndex:99, height: "60px",width:"100%",
+    <Header className="header" style={{textAlign:'center',backgroundColor:'##002140',position:'fixed',zIndex:99, height: "60px",width:"100%",
               // display: 'flex',
               // justifyContent:"space-between",
             }}>
           <div className="logo" />
           <img src="https://zhtj.youth.cn/zhtj/static/img/web_logo.png" alt="" style={{ height:'60px',width:'60px'}}/>
           <span style={{ color:"rgb(102 150 174)" , verticalAlign: "middle",  font:'italic bold 24px Georgia,serif'}}>智慧团建网站</span>
-            <Dropdown overlay={popMenus}>
+            <Dropdown overlay={popMenus} arrow>
               <div style={{
                                   position: "absolute",
                                   right: "20px",
                                   top: "-3px",
               }}>
-                <Avatar style={{
-                  backgroundColor:'#3c234b'
-                }}>root</Avatar>
+                <Avatar shape="square" size={26} src="./1.jpg" />
                 <span style={{
                   color: "#b2b264",
                 }}>
-                 您好，尊敬的{this.state.root}
+                 您好，尊敬的{this.state.root.jurisdiction}
                 </span>
               </div>
       </Dropdown>
@@ -109,11 +119,12 @@ interface IState {
                  {
                   routes.map((route: any) => (
                     route.routes ? <SubMenu key={route.path} icon={ route.icon ? <IconFont type={ route.icon}/>:''} title={route.title}>
-                      {route.routes.map((item: any) => (<Menu.Item key={item.path}  onClick={() => { this.props.history.push(item.path)
+                      {route.routes.map((item: any) => (<Menu.Item key={item.path} onClick={() => {
+                        this.props.history.push({ pathname: item.path, root: {...this.state.root}})
                        }}>
                         {item.icon?<IconFont type={ item.icon} />:''} {item.title}
                        </Menu.Item>))}
-                    </SubMenu> : (<Menu.Item key={route.path} title={route.title}  icon={ route.icon ? <IconFont type={ route.icon}/>:''} onClick={() => { this.props.history.push(route.path) }}>
+                    </SubMenu> : (<Menu.Item key={route.path} title={route.title}  icon={ route.icon ? <IconFont type={ route.icon}/>:''} onClick={() => { this.props.history.push({ pathname: route.path, root: {...this.state.root}}) }}>
                       {route.title}
                       </Menu.Item>)
                   ))
