@@ -1,35 +1,14 @@
-.notice{
-    height: 620px;
-    width: 800px;
-    margin:0 auto;
-    border:1px solid #ddd;
-    box-shadow: 0 2px 16px 0 #e7e7e7;
-    margin-top:-20px;
-    position: relative;
-    margin-bottom: -48px;
+
+.noticeEdit p:before{
+    display: inline-block;
+    margin-right: 4px;
+    color: #ff4d4f;
+    font-size: 14px;
+    font-family: SimSun,sans-serif;
+    line-height: 1;
+    content: "*";
 }
-.notice .ant-picker-input > input:placeholder-shown{
+    
+.noticeEdit .ant-picker-input>input {
     text-align: center;
 }
-.notice textarea.ant-input{
-    height: 400px;
-}
-.notice .ant-input:placeholder-shown{
-    font-size: 20px;
-height: 410px;
-}
-.notice *{
-    font-family: cursive;
-    font-size: 18px;
-}
-.notice .ant-picker-range-separator{
-    line-height: 27px;
-    height: 10px;
-}
-
-.notice .num{
-    float: right;
-    margin-top: -28px;
-    margin-right:95px;
-}
-

@@ -4,6 +4,7 @@ import { LikeTwoTone,DownCircleTwoTone,UpCircleTwoTone,DeleteTwoTone,SnippetsTwo
 import BraftEditor from 'braft-editor'
 import moment from 'moment';
 import axios from 'axios'
+import cookie from 'react-cookies'
 import qs from 'qs';
 const { TextArea } = Input;
 function createMarkup(html:any) {
@@ -128,13 +129,9 @@ export default  class Main extends Component<IProps, IState>{
             });
         }
     componentDidMount() {
-        if (this.props.location.root) {
-            this.setState({
-                root:this.props.location.root
-            }, () => {
-                console.log(this.state.root);
-            })
-        }
+        this.setState({
+            root: cookie.load('root')
+          })
         this.init()
     }
     public init = () => {
@@ -319,7 +316,7 @@ export default  class Main extends Component<IProps, IState>{
                                             actions={this.renderActions(i, item.id)}
                                         />
                                     )) : null}
-                                    <div className='toggle-reply-box' style={{ display: item.children?(item.children.length >1 ? 'block' : 'none'):'none' }}>
+                                    <div className='toggle-reply-box' style={{ display: item.children?(item.children.length >2 ? 'block' : 'none'):'none' }}>
                                         {
                                             expandIds.includes(item.id) ? (
                                                 <span onClick={() => this.foldReply(item)}>收起全部{item.children?item.children.length:0}条回复 <UpCircleTwoTone /></span>

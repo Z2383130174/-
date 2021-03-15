@@ -300,8 +300,6 @@ public anyDelete = () => {
     let value = e.target.value
       this.setState({
         userData: {...this.state.userData,password:value}
-      }, () => {
-          console.log(this.state.userData);     
       })
   }
   //新增修改账号触发事件
@@ -309,16 +307,12 @@ public anyDelete = () => {
     let value = e.target.value
       this.setState({
         userData: {...this.state.userData,rootname:value}
-      }, () => {
-          console.log(this.state.userData);     
       })
   }
   public ReferrootnameChange= (e: any) => { 
     let value = e.target.value
       this.setState({
-        referData: {...this.state.referData,rootname:value}
-      }, () => {
-          console.log(this.state.referData);     
+        referData: {...this.state.referData,rootname:value} 
       })
   }
   

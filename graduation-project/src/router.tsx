@@ -4,7 +4,8 @@ import Home from "./component/Home/Home/index"    //登录主页面
 import accountManagement from './pages/admin/accountManagement/index'
 import Logging from './pages/admin/logging/index'
 import ChangeYear from './pages/admin/changeYear/index'
-import Notice  from './pages/admin/NewsConstruction/Notice/index'
+import Notice from './pages/admin/NewsConstruction/Notice/index'
+import editNotice from './pages/admin/NewsConstruction/Notice/edit'
 import News from './pages/admin/NewsConstruction/News/index'
 import NewsDetails from './pages/admin/NewsConstruction/News/newsDetail/index'
 import Publicity from './pages/admin/NewsConstruction/publicity/index'
@@ -61,6 +62,13 @@ export const adminRoutes = [{
         title: '新闻详情',
         icon:"iconxinwen",
     },
+    {
+        path: '/admin/NewsConstruction/notice/edit',
+        component: editNotice,
+        isShow: false,
+        title: '公告详情',
+        icon:"iconxinwen",
+    },
       {
         path: '/admin/NewsConstruction',
         isShow: true,
@@ -92,7 +100,7 @@ export const adminRoutes = [{
                 path: '/admin/NewsConstruction/information',
                 component: Information,
                 isShow: true,
-                title: '学校团委信息',
+                title: '学校团委',
                 icon:"iconzhongyaoxinxi",
             },
         ]

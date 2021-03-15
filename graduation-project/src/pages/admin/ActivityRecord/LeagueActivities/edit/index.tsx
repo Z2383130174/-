@@ -54,28 +54,28 @@ export default class Main extends Component<IProps, IState>{
             if (this.props.location.data) { 
                  this.setState({
                     title:this.props.location.data.title
-            })
-   }
-   let didData = qs.stringify({
-    list: this.props.location.data.list
-  });
-   axios.post("http://www.test.com/activity/selectList.php",didData).then((res: any) => {
-     if (res.data.code === 200) { 
-       console.log(res.data.data.data);
-       const {activityTitle,activityType,activityNumber,startTime,endTime,content }=res.data.data.data[0]
-       this.formRef.current!.setFieldsValue({ activityTitle });
-       this.formRef.current!.setFieldsValue({ activityType });
-       this.formRef.current!.setFieldsValue({ activityNumber });
-       this.setState({
-         startTime,
-         endTime,
-         editorState: BraftEditor.createEditorState(content),
-         timedata: [moment(startTime, "YYYY年MM月DD日HH时mm分"), moment(endTime, "YYYY年MM月DD日HH时mm分")],
-       })
+                 })
+                 let didData = qs.stringify({
+                  list: this.props.location.data.list
+                });
+                 axios.post("http://www.test.com/activity/selectList.php",didData).then((res: any) => {
+                   if (res.data.code === 200) { 
+                     console.log(res.data.data.data);
+                     const {activityTitle,activityType,activityNumber,startTime,endTime,content }=res.data.data.data[0]
+                     this.formRef.current!.setFieldsValue({ activityTitle });
+                     this.formRef.current!.setFieldsValue({ activityType });
+                     this.formRef.current!.setFieldsValue({ activityNumber });
+                     this.setState({
+                       startTime,
+                       endTime,
+                       editorState: BraftEditor.createEditorState(content),
+                       timedata: [moment(startTime, "YYYY年MM月DD日HH时mm分"), moment(endTime, "YYYY年MM月DD日HH时mm分")],
+                     })
+                      }
+                      }).catch((err) =>{
+                        console.log(err); 
+                     })
         }
-        }).catch((err) =>{
-          console.log(err); 
-      })
   }
   //富文本编辑器
 public handleEditorChange = (editorState:any) => {

@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { Form, Input, Button, Row, Col, message } from 'antd';
 import { createFromIconfontCN } from '@ant-design/icons';
 import { withRouter, } from 'react-router-dom'
+import cookie from 'react-cookies'
 import axios from 'axios'
 import qs from 'qs';
 import './login.css'
@@ -54,7 +55,6 @@ export class Login extends Component <IProps,IState>{
       labelCol: { span: 6 },
       wrapperCol: { span: 18,offset:3 },
     };
-
     const tailLayout = {
       labelCol:{ offset:3},
       wrapperCol: { offset:3 ,span: 24 },
@@ -70,9 +70,13 @@ export class Login extends Component <IProps,IState>{
         this.generatedCode()
       } else {
         axios.post("http://www.test.com/adminuser/login.php", loginData).then((res: any) => {
-          if (res.data.code === 200) { 
+          if (res.data.code === 200) {
+            let inFifteenMinutes = new Date(new Date().getTime() + 100 * 24 * 3600 * 1000);//一天
+            cookie.save('root',res.data.data.data,{ expires: inFifteenMinutes }) 
             if (res.data.data.data.jurisdiction === '管理员') {
-              this.props.history.push({  pathname: "/admin", root: { ...res.data.data.data} })
+              this.props.history.push({  pathname: "/admin", query:{
+                root: { ...res.data.data.data}
+            }       })
             } else if (res.data.data.data.jurisdiction === '校团委') {
               console.log('校团委');
             } else if (res.data.data.data.jurisdiction === '基层干部') {

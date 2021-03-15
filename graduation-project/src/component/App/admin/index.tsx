@@ -1,8 +1,11 @@
 import React, { Component} from 'react'
-import { Layout, Menu, Dropdown,Avatar, message} from 'antd';
+import { Layout, Menu, Dropdown,Avatar,Modal,Row,Col,Input,Select, message} from 'antd';
 import { withRouter} from 'react-router-dom'
 import { adminRoutes } from '../../../router'
-import { createFromIconfontCN} from '@ant-design/icons';
+import { createFromIconfontCN } from '@ant-design/icons';
+import cookie from 'react-cookies'
+import qs from 'qs';
+import axios from 'axios';
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
 const routes=adminRoutes.filter(route=>route.isShow)
@@ -19,7 +22,12 @@ interface IProps {
 
 interface IState {
   collapsed: boolean,
-  root:any
+  root:any,
+  isModalVisible: boolean,
+  isOpen: boolean,
+  oldPassword: any,
+  newPassword: any,
+  againPassword:any
 }
 
  class AppHome extends Component<IProps,IState> {
@@ -27,27 +35,100 @@ interface IState {
         super(props)
         this.state = {
           collapsed: false,
-          root:''
+          root: '',
+          isModalVisible: false,
+          isOpen: false,
+          oldPassword: '',
+          newPassword: '',
+          againPassword:'',
       }
    }
    componentDidMount() {
-     if (this.props.location.root) { 
-          this.setState({
-          root:this.props.location.root
+     this.setState({
+       root: cookie.load('root')
      })
-    }
    }
- public  onCollapse = (collapsed: any) => {
+   public onCollapse = (collapsed: any) => {
     this.setState({ collapsed });
-   };
+  };
+   //查看个人信息弹窗
+  public handleOk = () => {
+  this.setState({
+    isModalVisible:!this.state.isModalVisible
+      })
+  }
+   //修改密码弹窗确认
+   public handleOk2 = () => {
+        const reg = /^(?![^a-zA-Z]+$)(?!\D+$)/;
+     if (this.state.oldPassword === this.state.root.password) {
+       if (this.state.newPassword && this.state.newPassword.length > 8 && reg.test(this.state.newPassword)) {
+         if (this.state.oldPassword !== this.state.newPassword) {
+          if (this.state.newPassword === this.state.againPassword) {
+              console.log(this.state.root);
+              let personageData = qs.stringify({
+                ...this.state.root,
+                  newPassword:this.state.newPassword
+              });  
+              axios.post("http://www.test.com/adminuser/updataPersonage.php", personageData).then((res: any) => {
+                if (res.data.code === 200) {
+                  this.setState({
+                    isOpen: !this.state.isOpen,
+                    oldPassword:'',
+                    newPassword:'',
+                    againPassword:'',
+                  })
+                  message.success('修改密码成功')
+                 }
+                }).catch((err) =>{
+                  console.log(err); 
+                })
+           } else {
+          message.error('你输入的两次新密码不一致，请确认后重新输入')
+          } 
+         } else {
+          message.error('你输入的旧密码和新密码一致，请确认后重新输入')
+          }
+         } else {
+          message.warning('新密码格式错误，请输入8~20位的密码，且需要同时包含数字和字母');
+         }
+       } else {
+        message.error('你输入的旧密码错误，请确认后重新输入')
+      }
+   }
+   //修改密码弹窗打开关闭
+   public handleCancel = () => {
+    this.setState({
+      isOpen: !this.state.isOpen
+    })
+  }
+   //输入老密码
+   public oldPassword = (e:any) => {
+     this.setState({
+           oldPassword:e.target.value
+         })
+   }
+   //输入新密码
+   public againPassword =(e:any) => {
+    this.setState({
+      againPassword:e.target.value
+    })
+   }
+    //确认输入的新密码
+   public newPassword =(e:any) => {
+    this.setState({
+      newPassword:e.target.value
+    })
+   }
    render() {
+     const {   collapsed, root, isModalVisible,isOpen,oldPassword,newPassword,againPassword}=this.state
      const popMenus = (<Menu onClick={(item:any) => {
        if (item.key === "out") {
+         cookie.remove('root')
          this.props.history.push("/login")
        } else if (item.key === "personage") {
-         message.warning('打开活动中心')
+         this.handleOk()
        } else if (item.key === "revamp") {
-         message.warning('修改密码')
+         this.handleCancel()
        }
      }}>
        <Menu.Item key="personage" style={{
@@ -73,10 +154,8 @@ interface IState {
           overflow: "hidden",
 }}>
     <Header className="header" style={{textAlign:'center',backgroundColor:'##002140',position:'fixed',zIndex:99, height: "60px",width:"100%",
-              // display: 'flex',
-              // justifyContent:"space-between",
             }}>
-          <div className="logo" />
+          <div/>
           <img src="https://zhtj.youth.cn/zhtj/static/img/web_logo.png" alt="" style={{ height:'60px',width:'60px'}}/>
           <span style={{ color:"rgb(102 150 174)" , verticalAlign: "middle",  font:'italic bold 24px Georgia,serif'}}>智慧团建网站</span>
             <Dropdown overlay={popMenus} arrow>
@@ -89,7 +168,7 @@ interface IState {
                 <span style={{
                   color: "#b2b264",
                 }}>
-                 您好，尊敬的{this.state.root.jurisdiction}
+                 您好，尊敬的{root.jurisdiction}
                 </span>
               </div>
       </Dropdown>
@@ -104,7 +183,7 @@ interface IState {
           minWidth: "208px",
           transition: "background-color 0.3s ease 0s, min-width 0.3s ease 0s, max-width 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) 0s"
 }}>
-          <Sider collapsible collapsed={this.state.collapsed} onCollapse={this.onCollapse} style={{
+          <Sider collapsible collapsed={collapsed} onCollapse={this.onCollapse} style={{
             overflow: 'auto',
             height: '100vh',
             position: 'fixed',
@@ -132,7 +211,7 @@ interface IState {
         </Menu>
             </Sider>
           </div>
-          {this.state.collapsed ?<Layout style={{ padding: '0 24px 24px', marginLeft: "-118px" ,   transition: "background-color 0.3s ease 0s, min-width 0.3s ease 0s, max-width 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) 0s"}}>
+          {collapsed ?<Layout style={{ padding: '0 24px 24px', marginLeft: "-118px" ,   transition: "background-color 0.3s ease 0s, min-width 0.3s ease 0s, max-width 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) 0s"}}>
         <Content
           className="site-layout-background"
           style={{
@@ -155,8 +234,99 @@ interface IState {
               { this.props.children}
         </Content>
       </Layout>} 
-    </Layout>
-          
+        </Layout>
+        <Modal title="个人信息" visible={isModalVisible} onOk={this.handleOk} onCancel={this.handleOk}>
+          <div className="admin">
+          <Row>
+                <Col span={18} offset={3}><label className="FormLabelStyle">账号：</label>
+              <Input
+             defaultValue={root.id}
+             style={{
+              width: "80%",
+              marginLeft:'34px',
+            }}   disabled
+                ></Input></Col>
+              </Row>
+              <Row>
+                <Col span={18} offset={3}><label className="FormLabelStyle">密码：</label>
+              <Input.Password
+                defaultValue={root.password}
+                style={{
+                width: "80%",
+                marginLeft:'34px',
+              }}   disabled></Input.Password></Col>
+          </Row>
+          <Row>
+                <Col span={18} offset={3}><label className="FormLabelStyle">姓名：</label>
+              <Input
+             defaultValue={root.rootname}
+              style={{
+                width: "80%",
+                marginLeft:'34px',
+              }}   disabled
+                 ></Input></Col>
+              </Row>
+              <Row>
+            <Col span={18} offset={3}><label className="FormLabelStyle">权限：</label><Select
+              defaultValue={root.jurisdiction}
+              style={{
+                width: "80%",
+                  marginLeft:'34px',
+              }} disabled>
+            </Select></Col>
+            <Col span={18} offset={3} ><label className="FormLabelStyle">所属团支部：</label><Select
+               defaultValue={root.userSchool}
+                   style={{
+                    width: "80%",
+                    marginLeft:'34px',
+                  }}   disabled
+            >
+                </Select></Col>
+       </Row>  
+       </div>
+        </Modal>
+        <Modal title="修改密码" visible={isOpen} onOk={this.handleOk2} onCancel={this.handleCancel}>
+        <Row>
+                <Col span={18} offset={3}><label className="FormLabelStyle">账号：</label>
+              <Input
+             defaultValue={root.id}
+             style={{
+              width: "80%",
+              marginLeft:'34px',
+            }}   disabled
+                ></Input></Col>
+              </Row>
+              <Row>
+                <Col span={18} offset={3}><label className="FormLabelStyle">旧密码：</label>
+              <Input.Password value={oldPassword}
+                style={{
+                  width: "80%",
+                  marginLeft: '34px',
+                }}
+                onChange={ this.oldPassword}
+                 ></Input.Password></Col>
+          </Row>
+          <Row>
+                <Col span={18} offset={3}><label className="FormLabelStyle">新密码：</label>
+             <Input.Password value={newPassword}
+                style={{
+                  width: "80%",
+                  marginLeft: '34px',
+                }}
+                onChange={ this.newPassword}
+                 ></Input.Password></Col>
+          </Row>
+          <Row>
+                <Col span={18} offset={3}><label className="FormLabelStyle">确认新密码：</label>
+              <Input.Password value={againPassword}
+              style={{
+                width: "80%",
+                marginLeft: '34px',
+              }}
+              onChange={ this.againPassword}
+                 ></Input.Password></Col>
+              </Row>
+      </Modal>  
   </Layout>
     );
   }

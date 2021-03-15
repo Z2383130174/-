@@ -1,246 +1,212 @@
 import { Component } from 'react'
-import { Input, DatePicker, Button , ConfigProvider, message,Select} from 'antd'
-import zh_CN from 'antd/lib/locale-provider/zh_CN';
-import 'moment/locale/zh-cn';
-import moment from 'moment';
-import axios from 'axios';
-import qs from 'qs';
-import './note.css'
-
-import TQ from './tuanqi.jpg'
-const { Option } = Select;
-const { TextArea } = Input;
-const { RangePicker } = DatePicker;
-
+import { Card, Table, Button, Space, Pagination ,Popconfirm,message,Tooltip,ConfigProvider} from 'antd'
+import { SettingTwoTone, EditTwoTone, } from '@ant-design/icons';
+import axios from 'axios'
+import zhCN from 'antd/lib/locale/zh_CN';
+import qs from 'qs'
+// import { Table,message,Space, Modal,Input,Select,Row,Col,Button,Pagination,ConfigProvider} from 'antd';
 interface IProps {
-
+    history:any
 }
 
 interface IState {
-    title: any,
-    value: any,
-    school: any,
-    startTime: any,
-    endTime: any,
-    timedata: any,
-    userSchool:any
+  loading: boolean,
+  noticesData: any,
+  pagenumber: number,
+  referData: any,
+  total: number
 }
-
 export default  class Main extends Component<IProps, IState>{
     constructor(props: IProps) {
         super(props)
         this.state = {
-            title: '',
-            value: '',
-            school: '',
-            startTime: '',
-            endTime: '',
-            timedata: [moment(null, "YYYY年MM月DD日"), moment(null, "YYYY年MM月DD日")],
-            userSchool:'',
+          loading: false,
+          noticesData: [],
+          pagenumber: 1,
+          referData: {
+            limit: 10,
+            offset:0
+          },
+          total:0,
         }
-      
-    }
-    componentDidMount() { 
-        axios.post("http://www.test.com/gonggao/noteselect.php").then((res: any) => {  
-            if (res.data.code === 200) { 
-                const { title, value, school,startTime,endTime,userSchool}=res.data.data.data[0]
-                this.setState({
-                    title,
-                    value,
-                    school,
-                    startTime,
-                    endTime,
-                    userSchool,
-                   timedata: [moment(startTime,"YYYY年MM月DD日"), moment( endTime,"YYYY年MM月DD日")] 
-                }, () => {
-                        console.log(this.state.timedata);
-                        
-                })
-            }
-        }).catch((err) =>{
-            console.log(err); 
+  }
+  componentDidMount() { 
+    this.setState({
+      loading:true
+    }, () => { 
+        setTimeout(() => {
+          this.refer()
+     },500)
+    })
+  }
+  //查询数据
+  public refer = () => {
+    let referData = qs.stringify({
+           ...this.state.referData
+    });  
+    axios.post("http://www.test.com/gonggao/select.php",referData).then((res: any) => {  
+      if (res.data.code === 200) {
+        this.setState({
+          noticesData: res.data.data.data,
+          total: res.data.data.count,
+          loading:false
         })
-    }
-
-    // 内容变化
-    public onChange = (e: any) => {
-        const { value} = e.target
+      }
+    }).catch((err:any)=>{ 
+      console.log(err); 
+    })
+  }
+  //页码变化跳转
+   public pageChange = (page: number, pageSize: any) => { 
+    console.log("123");
+    this.setState({
+      loading:true,
+      pagenumber:page,
+        ...this.state.referData,
+        offset: (page - 1) * this.state.referData.limit,
+    },
+      () => { this.refer() }
+    )
+  }
+  //每页数据变化跳转
+  private onShowSizeChange = (current: number, size: number) => {
+    console.log("456");
+    this.setState({
+      pagenumber: current,
+    }, () => { 
         this.setState({
-            value
-        });
-    };
-    // 标题变化
-    public titleChange = (e: any) => {
-        const { value} = e.target
-        this.setState({
-            title:value
-        });
-    };
-    //公示时间变化
-    public dateChange = (date: any, dateString: any) => {
-        console.log(date, dateString);
-        console.log(typeof (dateString));
-        console.log(dateString[0]);
-            this.setState({
-                startTime:dateString[0],
-                endTime:dateString[1],
-                timedata: [moment(dateString[0],"YYYY年MM月DD日"), moment( dateString[1],"YYYY年MM月DD日")]
-            })
-    }
-    //接受单位
-    public userChange = (value:any) => { 
-        this.setState({
-            userSchool:value
-        })
-    }
-    //发布单位
-    public schoolChange = (e:any) => { 
-        const { value} = e.target
-        this.setState({
-            school:value
-        });
-    }
-    //发布
-    public release = () => {
-        if (this.state.title) { 
-            if (this.state.userSchool) { 
-                if (this.state.value) { 
-                    if (this.state.school) { 
-                        if (this.state.startTime && this.state.endTime) { 
-                            const { title, value, school, startTime, endTime,userSchool } = this.state;
-             let noticeData = qs.stringify({
-             title,value,school,startTime,endTime,userSchool,
-             reading:"已读",
-            })    
-                            axios.post("http://www.test.com/gonggao/notices.php", noticeData).then((res: any) => {  
-                                if (res.data.code === 200) { 
-                                    message.success('新增公告成功')
-                                }
-                            }).catch((err) =>{
-                                console.log(err); 
-                            })
-                        } else {
-                            message.warning('请输入公告时间')
-                        }
-                    } else {
-                        message.warning('请输入发布单位')
-                    }
-                } else {
-                    message.warning('请输入公告内容')
-                }
-            }else {
-                message.warning('请选择发布对象')
-            }
-        } else {
-            message.warning('请输入公告标题')
+          loading:true,
+          pagenumber: current,
+          referData: {
+          limit: size,
+          offset:(current-1) * size
         }
+      }, () => { 
+         this.refer() 
+      })
     }
-    //清空
-    public empty = () => {
-        this.setState({
-            title: '',
-            value: '',
-            school: '',
-            startTime: '',
-            endTime: '',
-            timedata: [moment(null, "YYYY年MM月DD日"), moment(null, "YYYY年MM月DD日")],
-            userSchool:'',
-        })
+  )
+  }
+    //打开修改弹窗
+    public openModal = (record:any) => {
+      this.props.history.push({ pathname: '/admin/NewsConstruction/notice/edit', data:{list:record.list,title:'修改公告发布'}})
+  } 
+    //删除用户数据
+    public deleteData = (record: any) => { 
+      let deleteData = qs.stringify({
+        list: record.list
+      });
+      axios.post("http://www.test.com/gonggao/delete.php",deleteData).then((res: any) => {
+        if (res.data.code === 200) { 
+          message.success('删除数据成功')
+          this.refer()
+        }
+         }).catch((err) =>{
+          console.log(err); 
+      })
     }
-    
+  //新增公告
+    public add = () => {
+        this.props.history.push({ pathname: '/admin/NewsConstruction/notice/edit', data: {title:'新增公告发布'}})
+    }
     render() {
-        const options = [
-            { label: '初中团支部', value: '初中团支部' },
-            { label: '高中团支部', value: '高中团支部' },
-            {label:'大学团支部',value:'大学团支部'}
-          ]
-        return (
-            <div className="note">
-                <div className="notice">
-                    <div style={{
-                        textAlign: 'left',
-                        marginTop: '10px',
-                        marginBottom: '10px',
-                        padding:"0px 40px"
+        const columns:any= [
+            {
+              title: '序号',
+              dataIndex: 'number',
+              align: 'center ' as 'center',
+              width:'7%',
+              render: (text: any,record:any,index:any) => `${(this.state.pagenumber-1)*this.state.referData.limit+index+1}`,
+            },
+            {
+              title: '标题',
+              dataIndex: 'title',
+              align: 'center ' as 'center',
+              width: '16%',
+              onCell: () => {
+                return {
+                  style: {
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
+                    textOverflow:'ellipsis',
+                    cursor: 'pointer',
+                    maxWidth:'220px'
+                  }
+                }
+              },
+              render: (text: any, record: any, index: any) => (
+                <Tooltip placement="top" title={text}>
+                  { text}
+              </Tooltip >
+            ),
+              
+            },
+            {
+              title: '公告接收对象',
+              dataIndex: 'userSchool',
+              align: 'center ' as 'center',
+              width:'15%'
+            },
+            {
+                title: '公告发布单位',
+                dataIndex: 'school',
+                align: 'center ' as 'center',
+                width:'15%'
+            },
+            {
+                title: '公示开始时间',
+                dataIndex: 'startTime',
+                align: 'center ' as 'center',
+                width:'15%'
+          }, 
+          {
+            title: '公示结束时间',
+            dataIndex: 'endTime',
+            align: 'center ' as 'center',
+            width:'15%'
+          }, 
+            {
+              title: '操作',
+              width:'19%',
+              align:'center 'as 'center',
+              render: (text:any, record:any) => (
+                <Space size="middle">                 
+                  <a onClick={() => { this.openModal(record) }}><EditTwoTone onClick={() => {  this.openModal(record )}}/>修改</a>
+                  <Popconfirm title="确认删除此项"
+                     okText="Yes"
+                     cancelText="No"
+                    onCancel={() => {
+                      console.log("用户取消删除")
+                    }}
+                    onConfirm={() => {      
+                      this.deleteData(record)
                     }}>
-                    公告标题: <Input value={this.state.title} onChange={ this.titleChange} style={{
-                            width: 'auto',
-                            height: "27.6px",
-                            marginRight:'150px'
-                        }}></Input>
-                    选择发布对象:<Select value={this.state.userSchool}
-                            allowClear   
-                              style={{
-                                width: "20%",
-                                 }}
-          onChange={this.userChange}>
-        { options.map((item:any) =>(
-       <Option value={ item.value}>{item.label}</Option>
-         ))}
-              </Select>
-                   </div>
-                    <TextArea
-                        value={this.state.value}
-                        placeholder="请输入公示内容"
-                        onChange={this.onChange}
-                        allowClear
-                        showCount
-                        maxLength={2000}
-                    />
-                    <span className="num">公告字数：</span>
-                    <div style={{
-                               position: 'absolute',
-                               right: 0,
-                               bottom:105
-                    }}>发布单位：<Input value={this.state.school} onChange={this.schoolChange} style={{
-                        width: '200px',
-                        height: "27.6px",
-                    }}></Input>
-                    </div>
-                    <span style={{
-                        position: 'absolute',
-                        right: 285,
-                        bottom: 56,
-                    }}> 公示时间：</span>
-                    <ConfigProvider locale={zh_CN}>
-                        <RangePicker style={{ position: 'absolute', right: 0, bottom: 55, }}
-                            format="YYYY年MM月DD日"
-                            onChange={this.dateChange}
-                            separator="~"
-                            value={this.state.startTime === "" || this.state.endTime === "" ? null : this.state.timedata}
-                        />
-                    </ConfigProvider>
-                    <img src={TQ} alt="" style={{
-                        width: '200px',
-                        height: '200px',
-                        borderRadius:'50%',
-                        position: "absolute",
-                        left: -230,
-                        top: 200,
-                        // transform: rotateY(180deg)
-                    }} />
-                     <img src={TQ} alt="" style={{
-                        width: '200px',
-                        height: '200px',
-                        borderRadius:'50%',
-                        position: "absolute",
-                        right: -230,
-                        top: 200,
-                        // transform: "rotateY(180deg)"
-                    }} />
-                     <Button type="primary" style={{
-                        position: 'absolute',
-                        left: 5,
-                        bottom: 5,
-                    }} onClick={ this.empty}>清空内容</Button>
-                    <Button type="primary" style={{
-                        position: 'absolute',
-                        right: 5,
-                        bottom: 5,
-                    }} onClick={ this.release}>发布公告</Button>
-                   
-                </div>
-            </div>
+                    <a> <SettingTwoTone />删除</a>
+                 
+                      </Popconfirm>
+                    <a> <SettingTwoTone />审核</a>
+                </Space>
+              ),
+            },
+        ];
+        return (
+            <Card title="公告" extra={<Button type="primary" size="small" onClick={ this.add}>新增</Button>}>
+            <Table columns={columns} dataSource={ this.state.noticesData} loading={ this.state.loading} rowKey={record => record.list} pagination={false} /> 
+            <ConfigProvider locale={zhCN}>
+            <Pagination
+              total={this.state.total}
+              showSizeChanger
+              showQuickJumper
+              onChange={this.pageChange}
+              onShowSizeChange={this.onShowSizeChange}
+              showTotal={total => `共 ${total}条数据 `}
+              current={this.state.pagenumber}
+              style={{
+                marginTop: '30px',
+                float:'right'
+                }}
+            />  </ConfigProvider>
+          </Card> 
         );
     }
 

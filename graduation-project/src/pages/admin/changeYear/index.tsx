@@ -1,67 +1,40 @@
 import { Component } from 'react'
 import { Upload, Modal } from 'antd';
+import axios from 'axios'
 import { PlusOutlined } from '@ant-design/icons';
 interface IProps {
     history:any
 }
 
 interface IState {
-    previewVisible: boolean,
-    previewImage: any,
-    previewTitle: any,
-    fileList:any,
+  previewVisible: boolean,
+  previewImage: string,
+  previewTitle: string,
+  fileList: any
 }
 export default  class Main extends Component<IProps, IState>{
-    constructor(props: IProps) {
-        super(props)
-        this.state = {
-            previewVisible: false,
-            previewImage: '',
-            previewTitle: '',
-            fileList: [
-              {
-                uid: '-1',
-                name: 'image.png',
-                status: 'done',
-                url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-              },
-              {
-                uid: '-2',
-                name: 'image.png',
-                status: 'done',
-                url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-              },
-              {
-                uid: '-3',
-                name: 'image.png',
-                status: 'done',
-                url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-              },
-              {
-                uid: '-4',
-                name: 'image.png',
-                status: 'done',
-                url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-              },
-
-            ],
-        }
+  constructor(props: IProps) {
+    super(props)
+    this.state = {
+      previewVisible: false,
+      previewImage: '',
+      previewTitle: '',
+      fileList: []
     }
-    public handleCancel = () => this.setState({ previewVisible: false });
-    public getBase64=(file:any)=> {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.readAsDataURL(file);
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = error => reject(error);
-        });
-      }
+  }
+  componentDidMount() {
+    axios.post("http://www.test.com/selectPicture.php").then((res: any) => {
+   console.log(res.data.data);
+   
 
+    })
+  }
+   public handleCancel = () => this.setState({ previewVisible: false });
+   beforeUpload=(data:any)=>{
+    return false;
+   }
    public handlePreview = async (file:any) => {
-      if (!file.url && !file.preview) {
-        file.preview = await this.getBase64(file.originFileObj);
-      }
-  
+
       this.setState({
         previewImage: file.url || file.preview,
         previewVisible: true,
@@ -69,13 +42,8 @@ export default  class Main extends Component<IProps, IState>{
       });
     };
   
-    public handleChange = ({ fileList}:any) => this.setState({
-        fileList
-    }, () => { 
-            console.log(this.state.fileList);   
-    });
-  
-    render() {
+    public handleChange = ({ fileList }:any) => this.setState({ fileList });
+  render() {
     const { previewVisible, previewImage, fileList, previewTitle } = this.state;
     const uploadButton = (
       <div>
@@ -85,26 +53,36 @@ export default  class Main extends Component<IProps, IState>{
     );
         return (
             <div>
-                <Upload
-          action="http://www.test.com/activity/editPicture.php"
+            <Upload
+          action="http://www.test.com/editPicture.php"
           listType="picture-card"
           fileList={fileList}
           onPreview={this.handlePreview}
           onChange={this.handleChange}
         >
-          {fileList.length >= 8 ? null : uploadButton}
-        </Upload>
-        <Modal
+          {fileList.length >= 4 ? null : uploadButton}
+            </Upload>
+            <Modal
           visible={previewVisible}
           title={previewTitle}
           footer={null}
           onCancel={this.handleCancel}
         >
-          <img alt="example" style={{ width: '100%' }} src={previewImage} />
+              <img alt="example" style={{ width: '100%' }} src={previewImage} />
         </Modal>
-
             </div>
         );
     }
 
 }
+
+
+
+
+
+
+
+
+
+ 
+
