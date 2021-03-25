@@ -1,6 +1,6 @@
 import { Component } from 'react'
-import { Card, Table, Button, Space, Pagination ,Popconfirm,message,Tooltip,ConfigProvider} from 'antd'
-import { SettingTwoTone, EditTwoTone, } from '@ant-design/icons';
+import { Card, Table, Button, Space, Pagination, Popconfirm, message, Tooltip, ConfigProvider, Input } from 'antd'
+import { SearchOutlined,ReloadOutlined, SettingTwoTone, EditTwoTone,} from '@ant-design/icons';
 import axios from 'axios'
 import zhCN from 'antd/lib/locale/zh_CN';
 import qs from 'qs'
@@ -25,22 +25,27 @@ export default  class Main extends Component<IProps, IState>{
           pagenumber: 1,
           referData: {
             limit: 10,
-            offset:0
+            offset: 0,
+            titleValue: '',
+            typeValue:'',
           },
           total:0,
         }
   }
   componentDidMount() { 
+  this.refer()
+  }
+  //查询数据
+  public refer = () => {
     this.setState({
       loading:true
     }, () => { 
         setTimeout(() => {
-          this.refer()
+          this.initRefer()
      },500)
     })
   }
-  //查询数据
-  public refer = () => {
+  public initRefer = () => {
     let referData = qs.stringify({
            ...this.state.referData
     });  
@@ -78,6 +83,7 @@ export default  class Main extends Component<IProps, IState>{
           loading:true,
           pagenumber: current,
           referData: {
+          ...this.state.referData,
           limit: size,
           offset:(current-1) * size
         }
@@ -87,9 +93,38 @@ export default  class Main extends Component<IProps, IState>{
     }
   )
   }
+    //标题搜索
+  public titleValueChange = (e:any) => {
+    this.setState({
+      referData:{
+      ...this.state.referData,
+        titleValue:e.target.value
+      }
+    })
+  }
+  //团日类型搜索
+  public typeValueChange = (e:any) => {
+    this.setState({
+      referData:{
+      ...this.state.referData,
+        typeValue:e.target.value
+      }
+    })
+  }
+  //重置搜索项
+  public reset = () => {
+    this.setState({
+      referData:{
+        limit: 10,
+        offset: 0,
+        titleValue: '',
+        typeValue:''
+         }
+    }, () => { this.refer()})
+  }
     //打开修改弹窗
     public openModal = (record:any) => {
-      this.props.history.push({ pathname: '/admin/ActivityRecord/LeagueActivities/edit', data:{list:record.list,title:'修改团日活动'}})
+      this.props.history.push({ pathname: '/admin/ActivityRecord/LeagueActivities/edit', data:{list:record.list,p1Time:record.picture1,p2Time:record.picture2,p3Time:record.picture3,title:'修改团日活动'}})
   }  
     //删除用户数据
     public deleteData = (record: any) => { 
@@ -188,9 +223,26 @@ export default  class Main extends Component<IProps, IState>{
             },
         ];
         return (
-
             <Card title="团日活动" extra={<Button type="primary" size="small" onClick={ this.add}>新增</Button>}>
-
+            <div style={{
+              marginBottom: '20px',
+              marginLeft:'40px'
+            }}>
+              标题： <Input style={{
+                width: "25%",
+                marginRight: '150px'
+              }}
+                value={this.state.referData.titleValue}
+                onChange={this.titleValueChange}></Input>
+            团日活动类型：<Input style={{
+                 width:"25%",
+              }}
+                value={this.state.referData.typeValue}  onChange={this.typeValueChange}>
+              </Input>
+              <div style={{ float:"right"}}>
+              <Button type="primary" icon={<SearchOutlined />} style={{marginRight:'30px'}}onClick={ this.refer}>查询</Button>
+              <Button type="dashed" icon={<ReloadOutlined />}   onClick={this.reset}>重置</Button></div>
+            </div>
             <Table columns={columns} dataSource={ this.state.acctivityData} loading={ this.state.loading} rowKey={record => record.list} pagination={false} /> 
             <ConfigProvider locale={zhCN}>
             <Pagination

@@ -71,18 +71,25 @@ export class Login extends Component <IProps,IState>{
       } else {
         axios.post("http://www.test.com/adminuser/login.php", loginData).then((res: any) => {
           if (res.data.code === 200) {
+            console.log(res.data.data.data.picture);
+            
             let inFifteenMinutes = new Date(new Date().getTime() + 100 * 24 * 3600 * 1000);//一天
-            cookie.save('root',res.data.data.data,{ expires: inFifteenMinutes }) 
+            cookie.save('root', {
+              'rootname': res.data.data.data.rootname,'id': res.data.data.data.id,
+              'jurisdiction': res.data.data.data.jurisdiction,
+              'list': res.data.data.data.list,
+              'password': res.data.data.data.password, 
+              // 'picture': res.data.data.data.picture,
+              'userSchool':res.data.data.data.userSchool,
+            }, { expires: inFifteenMinutes })
             if (res.data.data.data.jurisdiction === '管理员') {
-              this.props.history.push({  pathname: "/admin", query:{
-                root: { ...res.data.data.data}
-            }       })
+              this.props.history.push({  pathname: "/admin", })
             } else if (res.data.data.data.jurisdiction === '校团委') {
-              console.log('校团委');
+              message.error('您没有登录的权限')
             } else if (res.data.data.data.jurisdiction === '基层干部') {
-              console.log('基层干部');
+              message.error('您没有登录的权限')
             } else {
-              console.log('团员');
+              message.error('您没有登录的权限')
             }
           } else {
             message.error('账号或密码输入错误')

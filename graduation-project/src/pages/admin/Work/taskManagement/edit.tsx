@@ -10,8 +10,13 @@ import axios from 'axios';
 import qs from 'qs';
 import BraftEditor from 'braft-editor';
 import React from 'react';
-import './note.css'
-
+// import './note.css'
+const provinceData = ['管理员', '校团委','基层团干部'];
+const cityData = {
+  管理员: ['校团委', '基层团干部', '团员'],
+  校团委: ['基层团干部', '团员' ],
+  基层团干部:['团员']
+};
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 //使用阿里云图标
@@ -32,14 +37,23 @@ interface IState {
     timedata: any,
     editorState: any,
     userSchool: string,
-    cardTitle:string
+    cardTitle: string,
+    cities: any,
+    secondCity: any,
+    disabled: boolean,
+    isser: string,
+    accepter:string,
 }
-
 export default class Main extends Component<IProps, IState>{
     formRef = React.createRef<FormInstance>();
     constructor(props: IProps) {
         super(props)
-        this.state = {
+      this.state = {
+            accepter: '',
+            isser:'',
+            disabled:true,
+            cities: provinceData,
+            secondCity:[],
             editorState: BraftEditor.createEditorState(null),
             startTime: '',
             endTime: '',
@@ -56,15 +70,19 @@ export default class Main extends Component<IProps, IState>{
               let didData = qs.stringify({
                 list: this.props.location.data.list
                 });
-           axios.post("http://www.test.com/gonggao/selectList.php",didData).then((res: any) => {  
+           axios.post("http://www.test.com/task/selectList.php",didData).then((res: any) => {  
                     if (res.data.code === 200) {
-                        const { title, school, startTime, endTime, userSchool,content } = res.data.data.data[0]
+                        const { title, school, startTime, endTime, userSchool,content,isser,accepter} = res.data.data.data[0]
                         this.formRef.current!.setFieldsValue({title});
                         this.formRef.current!.setFieldsValue({school});
-                        this.setState({
+                      this.setState({
+                            secondCity:cityData[isser],
+                            isser,
+                            accepter,
                             startTime,
                             endTime,
                             userSchool,
+                            disabled:false,
                             editorState: BraftEditor.createEditorState(content),
                            timedata: [moment(startTime,"YYYY年MM月DD日"), moment( endTime,"YYYY年MM月DD日")] 
                         })
@@ -81,16 +99,25 @@ export default class Main extends Component<IProps, IState>{
     public userChange = (value:any) => {
         this.setState({
             userSchool:value
-        }, () => {
-            console.log(this.state.userSchool);
-            
         })
     }
+  //
+  public isserCahange = (value: any) => {
+    this.setState({
+      isser:value,
+      secondCity: cityData[value],
+      accepter:cityData[value][0],
+      disabled:false
+    })
+  }
+  //
+  public accepterChange = (value:any)=>{
+    this.setState({
+      accepter:value,
+    })
+  }
     //公示时间变化
     public dateChange = (date: any, dateString: any) => {
-        console.log(date, dateString);
-        console.log(typeof (dateString));
-        console.log(dateString[0]);
             this.setState({
                 startTime:dateString[0],
                 endTime:dateString[1],
@@ -100,50 +127,60 @@ export default class Main extends Component<IProps, IState>{
     //发布
     public onFinish =  (values: any) => {
       if (this.state.userSchool) {
-        if (!this.state.editorState.isEmpty()) {
-          if (this.state.startTime) {
-            if (this.props.location.data.title === '新增公告发布') {
-              let noticeData = qs.stringify({
-                ...values,
-                content: this.state.editorState.toHTML(),
-                reading: "未读",
-                startTime: this.state.startTime,
-                endTime: this.state.endTime,
-                userSchool:this.state.userSchool
-            })
-              axios.post("http://www.test.com/gonggao/notices.php",noticeData).then((res: any) => {
-                if (res.data.code === 200) {
-                  message.success('新增公告成功')
-                  this.props.history.push('/admin/NewsConstruction/notice')
-                }
-              }).catch((err) => {
-                console.log(err);
-              })
+        if (this.state.isser) {
+          if (this.state.accepter) {
+            if (!this.state.editorState.isEmpty()) {
+              if (this.state.startTime) {
+                if (this.props.location.data.title === '新增任务') {
+                  let noticeData = qs.stringify({
+                    ...values,
+                    isser: this.state.isser,
+                    accepter:this.state.accepter,
+                    content: this.state.editorState.toHTML(),
+                    startTime: this.state.startTime,
+                    endTime: this.state.endTime,
+                    userSchool:this.state.userSchool
+                })
+                  axios.post("http://www.test.com/task/task.php",noticeData).then((res: any) => {
+                    if (res.data.code === 200) {
+                      message.success('新增任务成功')
+                      this.props.history.push('/admin/work/taskManagement')
+                    }
+                  }).catch((err) => {
+                    console.log(err);
+                  })
+                } else {
+                  let editNoticeData = qs.stringify({
+                    ...values,
+                    isser: this.state.isser,
+                    accepter:this.state.accepter,
+                    list: this.props.location.data.list,
+                    content: this.state.editorState.toHTML(),
+                    startTime: this.state.startTime,
+                    endTime: this.state.endTime,
+                    userSchool:this.state.userSchool
+                })
+                  axios.post("http://www.test.com/task/update.php",editNoticeData).then((res: any) => {
+                    if (res.data.code === 200) {
+                      message.success('修改任务成功')
+                      this.props.history.push('/admin/work/taskManagement')
+                    }
+                  }).catch((err) => {
+                    console.log(err);
+                  })
+                 }
+              } else {
+                message.warning('请选择任务时间段')
+              }
             } else {
-              let editNoticeData = qs.stringify({
-                ...values,
-                list: this.props.location.data.list,
-                content: this.state.editorState.toHTML(),
-                reading: "未读",
-                startTime: this.state.startTime,
-                endTime: this.state.endTime,
-                userSchool:this.state.userSchool
-            })
-              axios.post("http://www.test.com/gonggao/update.php",editNoticeData).then((res: any) => {
-                if (res.data.code === 200) {
-                  message.success('修改公告成功')
-                  this.props.history.push('/admin/NewsConstruction/notice')
-                }
-              }).catch((err) => {
-                console.log(err);
-              })
-             }
+              message.warning('任务内容不能为空')
+            }
           } else {
-            message.warning('请选择公告发布时间')
+            message.warning('请选择接收人')
           }
         } else {
-          message.warning('公告内容不能为空')
-        }
+          message.warning('请选择发布人')
+         }
       } else {
         message.warning('请选择发布对象')
       }
@@ -160,8 +197,7 @@ export default class Main extends Component<IProps, IState>{
             timedata: [moment(null, "YYYY年MM月DD日"), moment(null, "YYYY年MM月DD日")],
         })
     }
-    
-    render() {
+  render() {
         const options = [
             { label: '初中团支部', value: '初中团支部' },
             { label: '高中团支部', value: '高中团支部' },
@@ -182,7 +218,7 @@ export default class Main extends Component<IProps, IState>{
                         }}>
                         <div style={{display:'inline-block',width:'45%'}}>
         <Form.Item
-            label={<p>标题</p>}
+            label={<p>任务标题</p>}
             style={{
               marginBottom: '-2px',
             }}
@@ -190,39 +226,85 @@ export default class Main extends Component<IProps, IState>{
       </Form.Item>
       <Form.Item 
             name="title"  
-            rules={[{  required: true,message: '请输入公告的标题' }]}>
+            rules={[{  required: true,message: '请输任务的标题' }]}>
           <Input style={{
              width:'80%'
-          }} prefix={<IconFont type="iconxin" />} placeholder="请您输入公告的标题"/>
+          }} prefix={<IconFont type="iconxin" />} placeholder="请您输入任务的标题"/>
       </Form.Item>
       </div>
         <div style={{display:'inline-block',width:'45%'}}>
       <Form.Item
-            label={<p >发布对象</p>}
+            label={<p >接收对象</p>}
             style={{
               marginBottom: '-2px',
             }}
       >
       </Form.Item>
          <Select value={this.state.userSchool?this.state.userSchool:undefined}
-            placeholder="请选择公告的发布对象"
+            placeholder="请选择任务的接收对象"
                   allowClear   
                   style={{
                       width: "80%",
                          }}
           onChange={this.userChange}>
-        { options.map((item:any) =>(
+        {options.map((item:any) =>(
        <Option value={ item.value}>{item.label}</Option>
          ))}
               </Select>
              </div>
            </div>
         <div style={{
+                  marginLeft: '50px',
+                  marginBottom:'20px'
+                }}>
+     <div style={{ display: 'inline-block', width: '45%' }}>
+     <Form.Item
+            label={<p>任务发布人</p>}
+            style={{
+              marginBottom: '-2px',
+            }}
+      > 
+         </Form.Item>
+         <Select value={this.state.isser?this.state.isser:undefined}
+            placeholder="请选择任务的发布人"
+                  allowClear   
+                  style={{
+                      width: "80%",
+                         }}
+          onChange={this.isserCahange}>
+        { this.state.cities.map((item:any) =>(
+       <Option value={ item}>{item}</Option>
+         ))}
+              </Select>
+         </div>
+       <div style={{ display: 'inline-block', width: '45%' }}>
+     <Form.Item
+            label={<p>任务接收人</p>}
+            style={{
+              marginBottom: '-2px',
+            }}
+      > 
+         </Form.Item>
+         <Select value={this.state.accepter?this.state.accepter:undefined}
+                      placeholder="请选择任务的接收人"
+                      disabled={this.state.disabled}
+                  allowClear   
+                  style={{
+                      width: "80%",
+                         }}
+          onChange={this.accepterChange}>
+        { this.state.secondCity.map((item:any) =>(
+       <Option value={item}>{item}</Option>
+         ))}
+              </Select>
+                  </div>
+                  </div>
+        <div style={{
            marginLeft:'50px'
-              }}>
+                }}>
       <div style={{ display: 'inline-block', width: '45%' }}>
         <Form.Item
-            label={<p>发布单位</p>}
+            label={<p>请输入任务的发布单位</p>}
             style={{
               marginBottom: '-2px',
             }}
@@ -230,14 +312,14 @@ export default class Main extends Component<IProps, IState>{
          </Form.Item>
       <Form.Item 
             name="school"  
-            rules={[{  required: true, message: '请输入公告的发布单位' }]}>
+            rules={[{  required: true, message: '请输入任务的发布单位' }]}>
           <Input style={{
-                                width:'80%'
-                            }} prefix={<IconFont type="iconxin" />} placeholder="请输入公告的发布单位"/>
-                                </Form.Item>   </div>
-                            <div style={{ display: 'inline-block', width: '45%' }}>
+                  width:'80%'
+               }} prefix={<IconFont type="iconxin" />} placeholder="请输入任务的发布单位"/>
+                 </Form.Item>   </div>
+             <div style={{ display: 'inline-block', width: '45%' }}>
           <Form.Item
-            label={<p>公示时间</p>}
+            label={<p>任务时间</p>}
             style={{
               marginBottom: '-2px',
             }}
@@ -254,7 +336,7 @@ export default class Main extends Component<IProps, IState>{
 
       </div>
                 </div>
-                <Form.Item label={<p>您需要在下面输入此次公告的内容</p>}
+                <Form.Item label={<p>您需要在下面输入此次任务的内容</p>}
                   style={{
                     marginBottom: '20px',   
                     marginLeft: '50px'

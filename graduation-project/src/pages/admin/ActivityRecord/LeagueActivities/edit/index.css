@@ -10,3 +10,18 @@
 .editactivites .ant-picker-input > input:placeholder-shown{
     text-align: center;
 }
+.editactivites .ant-upload.ant-upload-select-picture-card{
+    width: 200px;
+    height: 200px;
+    margin-left: 80px;
+    margin-top: 20px;
+}
+.editactivites .ant-upload-picture-card-wrapper{
+   width: 30%;
+}
+.editactivites .upload2 .ant-upload.ant-upload-select.ant-upload-select-picture-card{
+    display: none;
+}
+ .editactivites .upload3 .ant-upload.ant-upload-select.ant-upload-select-picture-card{
+    display: none;
+}

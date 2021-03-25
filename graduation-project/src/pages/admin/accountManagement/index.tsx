@@ -495,10 +495,10 @@ public anyDelete = () => {
     return (
       <div className="user">
         <Row gutter={48} style={{ marginBottom: '15px' }}>
-          <Col span={9} style={{
-            marginLeft: '79px',
-            marginBottom:"20px"
-          }}><label>姓名：</label><Input value={this.state.referData.name} onChange={this.ReferrootnameChange} style={{width:'60%'}}></Input></Col>
+        <Col span={9} style={{
+                  marginLeft: '79px',
+                  marginBottom:"20px"
+          }}><label>账号：</label><Input value={this.state.referData.id} onChange={this.referIdChange} style={{width:'60%'}}></Input></Col>
           <Col span={9} ><label>权限：</label><Select value={this.state.referData.jurisdiction}
           allowClear   
           style={{
@@ -510,9 +510,10 @@ public anyDelete = () => {
          ))}
           </Select></Col>
           <Col span={9} style={{
-                  marginLeft: '79px',
-                  marginBottom:"20px"
-          }}><label>账号：</label><Input value={this.state.referData.id} onChange={this.referIdChange} style={{width:'60%'}}></Input></Col>
+            marginLeft: '79px',
+            marginBottom:"20px"
+          }}><label>姓名：</label><Input value={this.state.referData.name} onChange={this.ReferrootnameChange} style={{width:'60%'}}></Input></Col>
+        
           <Col span={9} ><label style={{
             marginLeft:'-42px'
           }}>所属团支部：</label><Select value={this.state.referData.userSchool}

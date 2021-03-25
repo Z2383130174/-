@@ -1,23 +1,26 @@
+/* eslint-disable jsx-a11y/anchor-has-content */
 import React, { Component} from 'react'
-import { Layout, Menu, Dropdown,Avatar,Modal,Row,Col,Input,Select, message} from 'antd';
+import { Layout, Menu, Dropdown, Avatar, Modal, Row, Col, Input, Select, message, Upload,Badge  } from 'antd';
+import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { withRouter} from 'react-router-dom'
 import { adminRoutes } from '../../../router'
 import { createFromIconfontCN } from '@ant-design/icons';
 import cookie from 'react-cookies'
 import qs from 'qs';
 import axios from 'axios';
+import './index.css'
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
 const routes=adminRoutes.filter(route=>route.isShow)
 const IconFont = createFromIconfontCN({
   scriptUrl: [
-"//at.alicdn.com/t/font_1999223_1bhohl4vo1w.js"
+"//at.alicdn.com/t/font_1999223_7h8ikv213m.js"
   ], 
 });
 
 interface IProps {
   history: any,
-  location:any
+  location: any,
 }
 
 interface IState {
@@ -27,26 +30,51 @@ interface IState {
   isOpen: boolean,
   oldPassword: any,
   newPassword: any,
-  againPassword:any
+  againPassword: any,
+  loading: boolean,
+  pictureData: any,
 }
 
  class AppHome extends Component<IProps,IState> {
     constructor(props: IProps) {
         super(props)
-        this.state = {
+      this.state = {
           collapsed: false,
           root: '',
           isModalVisible: false,
           isOpen: false,
           oldPassword: '',
           newPassword: '',
-          againPassword:'',
+          againPassword: '',
+          loading: false,
+          pictureData: {
+            list:''
+          },
       }
    }
    componentDidMount() {
      this.setState({
        root: cookie.load('root')
+     }, () => {
+       this.init()
      })
+   }
+   public init = () => {
+     let loginData = qs.stringify({
+       username: this.state.root.id,
+       password:this.state.root.password
+     });  
+      axios.post("http://www.test.com/adminuser/login.php", loginData).then((res: any) => {
+        this.setState({
+          root: {
+            ...this.state.root,
+            picture:res.data.data.data.picture
+          },
+          pictureData: {
+           list:res.data.data.data.list
+         }
+        })
+      })
    }
    public onCollapse = (collapsed: any) => {
     this.setState({ collapsed });
@@ -119,12 +147,45 @@ interface IState {
       newPassword:e.target.value
     })
    }
+   //上传个人头像
+   public  handleChange = ({ file }: any) => {
+     if (file.status === 'uploading') {
+      this.setState({
+        loading:true
+      })
+     }
+     if (file.status === "done") {
+      this.setState({
+        loading:false
+      })
+        message.success('头像上传成功');
+       console.log(file);
+       this.init()
+   
+        // this.props.onOk({ code, msg, data });
+     } else if (file.status === "error") {
+      this.setState({
+        loading:false
+      })
+        message.error('头像上传失败');
+      }
+   }
+   
+  
    render() {
-     const {   collapsed, root, isModalVisible,isOpen,oldPassword,newPassword,againPassword}=this.state
+     const { collapsed, root, isModalVisible,isOpen, oldPassword, newPassword, againPassword,loading,pictureData } = this.state
+     const uploadButton = (
+      <div>
+        {loading ? <LoadingOutlined /> : <PlusOutlined />}
+        <div style={{ marginTop: 8 }}>上传个人头像</div>
+      </div>
+    );
      const popMenus = (<Menu onClick={(item:any) => {
        if (item.key === "out") {
          cookie.remove('root')
          this.props.history.push("/login")
+       } else if (item.key === "circularize") {
+         this.props.history.push('/admin/circularize')
        } else if (item.key === "personage") {
          this.handleOk()
        } else if (item.key === "revamp") {
@@ -135,7 +196,15 @@ interface IState {
        fontSize: "15px",
      }}><IconFont type="iconUser" style={{
       fontSize: "15px",
-    }}/>个人中心</Menu.Item>
+         }} />个人中心</Menu.Item>
+         <Menu.Item key="circularize" style={{
+       fontSize: "15px",
+     }}><IconFont type="icon-" style={{
+      fontSize: "15px",
+         }} />账号注册审核
+     <Badge count={99} overflowCount={10} size="small" offset={ [20,-10]}>
+      <a href="#" className="head-example" />
+    </Badge></Menu.Item>
        <Menu.Item key="revamp" style={{
        fontSize: "15px",
      }}><IconFont type="iconedit" style={{
@@ -164,11 +233,18 @@ interface IState {
                                   right: "20px",
                                   top: "-3px",
               }}>
-                <Avatar shape="square" size={26} src="./1.jpg" />
+                <Avatar shape="square" size={26} src={root.picture?root.picture:"./1.jpg"} />
                 <span style={{
                   color: "#b2b264",
                 }}>
-                 您好，尊敬的{root.jurisdiction}
+                  您好，尊敬的{root.jurisdiction}
+                  <Badge count={99} overflowCount={10} size="small" style={{
+                    position: "absolute",
+                    right: "165px",
+                    top: "-20px",
+                  }}>
+      <a href="#" className="head-example" />
+    </Badge>
                 </span>
               </div>
       </Dropdown>
@@ -237,6 +313,22 @@ interface IState {
         </Layout>
         <Modal title="个人信息" visible={isModalVisible} onOk={this.handleOk} onCancel={this.handleOk}>
           <div className="admin">
+          <Row>
+              <Col span={18} offset={3}><label className="FormLabelStyle">上传你喜爱的照片作为您的头像：</label>
+                
+              <Upload
+        name="file"
+        listType="picture-card"
+        className="avatar-uploader" 
+        showUploadList={false}
+        data={pictureData}
+        action="http://www.test.com/adminuser/setPicture.php"
+        onChange={this.handleChange}
+      >
+        {this.state.root.picture ? <img src={this.state.root.picture} alt="avatar" style={{ width: 200,height:200 }} /> : uploadButton}
+                </Upload>
+              </Col >
+              </Row>
           <Row>
                 <Col span={18} offset={3}><label className="FormLabelStyle">账号：</label>
               <Input

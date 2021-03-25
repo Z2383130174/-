@@ -1,6 +1,6 @@
 import { Component } from 'react'
-import { Card, Table, Button, Space, Pagination ,Popconfirm,message,Tooltip,ConfigProvider} from 'antd'
-import { SettingTwoTone, EditTwoTone, } from '@ant-design/icons';
+import { Card, Table, Button, Space, Pagination ,Popconfirm,message,Tooltip,ConfigProvider,Input} from 'antd'
+import { SearchOutlined,ReloadOutlined, SettingTwoTone, EditTwoTone,} from '@ant-design/icons';
 import axios from 'axios'
 import zhCN from 'antd/lib/locale/zh_CN';
 import qs from 'qs'
@@ -25,26 +25,63 @@ export default  class Main extends Component<IProps, IState>{
           pagenumber: 1,
           referData: {
             limit: 10,
-            offset:0
+            offset: 0,
+            titleValue: '',
+            tecValue:''
           },
           total:0,
         }
   }
   componentDidMount() { 
+      this.refer()
+  }
+  //延时查询数据
+  public refer = () => {
     this.setState({
       loading:true
     }, () => { 
         setTimeout(() => {
-          this.refer()
+          this.initRefer()
      },500)
     })
   }
+  //重置
+  public reset =()=>{
+        this.setState({
+                referData: {
+                  limit: 10,
+                  offset: 0,
+                  titleValue: '',
+                  tecValue:''
+               }
+        }, () => {
+          this.refer()
+        })
+   }
+  //标题改变搜索
+  public teacherValueChange = (e:any) => {
+    this.setState({
+      referData: {
+        ...this.state.referData,
+        tecValue:e.target.value,
+      }
+    })
+  }
+  //姓名改变搜素
+  public classTitleValueChange = (e:any) => {
+    this.setState({
+      referData: {
+        ...this.state.referData,
+        titleValue:e.target.value,
+      }
+    })
+  }
   //查询数据
-  public refer = () => {
+  public initRefer = () => {
     let referData = qs.stringify({
            ...this.state.referData
     });  
-    axios.post("http://www.test.com/activity/select.php",referData).then((res: any) => { 
+    axios.post("http://www.test.com/classInformation/select.php",referData).then((res: any) => { 
       if (res.data.code === 200) {
         this.setState({
           acctivityData: res.data.data.data,
@@ -58,7 +95,6 @@ export default  class Main extends Component<IProps, IState>{
   }
   //页码变化跳转
    public pageChange = (page: number, pageSize: any) => { 
-    console.log("123");
     this.setState({
       loading:true,
       pagenumber:page,
@@ -70,7 +106,6 @@ export default  class Main extends Component<IProps, IState>{
   }
   //每页数据变化跳转
   private onShowSizeChange = (current: number, size: number) => {
-    console.log("456");
     this.setState({
       pagenumber: current,
     }, () => { 
@@ -78,8 +113,9 @@ export default  class Main extends Component<IProps, IState>{
           loading:true,
           pagenumber: current,
           referData: {
-          limit: size,
-          offset:(current-1) * size
+                ...this.state.referData,
+                limit: size,
+                offset:(current-1) * size
         }
       }, () => { 
          this.refer() 
@@ -89,14 +125,14 @@ export default  class Main extends Component<IProps, IState>{
   }
     //打开修改弹窗
     public openModal = (record:any) => {
-      this.props.history.push({ pathname: '/admin/ActivityRecord/LeagueActivities/edit', data:{list:record.list,title:'修改团日活动'}})
+      this.props.history.push({ pathname: '/admin/ActivityRecord/classInformation/edit', data:{list:record.list,pictureCreateTime:record.picture,title:'修改团课信息'}})
   }  
     //删除用户数据
     public deleteData = (record: any) => { 
       let deleteData = qs.stringify({
         list: record.list
       });
-      axios.post("http://www.test.com/activity/delete.php",deleteData).then((res: any) => {
+      axios.post("http://www.test.com/classInformation/delete.php",deleteData).then((res: any) => {
         if (res.data.code === 200) { 
           message.success('删除数据成功')
           this.refer()
@@ -107,7 +143,7 @@ export default  class Main extends Component<IProps, IState>{
     }
   //新增团日活动
     public add = () => {
-        this.props.history.push({ pathname: '/admin/ActivityRecord/LeagueActivities/edit', data: {title:'新增团日活动'}})
+        this.props.history.push({ pathname: '/admin/ActivityRecord/classInformation/edit', data: {title:'新增团课'}})
     }
     render() {
         const columns:any= [
@@ -119,8 +155,8 @@ export default  class Main extends Component<IProps, IState>{
               render: (text: any,record:any,index:any) => `${(this.state.pagenumber-1)*this.state.referData.limit+index+1}`,
             },
             {
-              title: '团课题目',
-              dataIndex: 'activityTitle',
+              title: '团课标题',
+              dataIndex: 'classTitle',
               align: 'center ' as 'center',
               width: '20%',
               onCell: () => {
@@ -142,14 +178,14 @@ export default  class Main extends Component<IProps, IState>{
               
             },
             {
-              title: '团课类型',
-              dataIndex: 'activityType',
+              title: '团课老师',
+              dataIndex: 'classTec',
               align: 'center ' as 'center',
               width:'15%'
             },
             {
-                title: '团课班主任',
-                dataIndex: 'activityNumber',
+                title: '团课人数',
+                dataIndex: 'classNumber',
                 align: 'center ' as 'center',
                 width:'8%'
             },
@@ -190,7 +226,29 @@ export default  class Main extends Component<IProps, IState>{
         return (
 
             <Card title="团日活动" extra={<Button type="primary" size="small" onClick={ this.add}>新增</Button>}>
-
+        <div style={{
+              marginBottom: '20px',
+              marginLeft:'40px'
+            }}>
+              团课标题： <Input style={{
+                width: "25%",
+                marginRight: '150px'
+              }}
+                value={this.state.referData.titleValue}
+                onChange={this.classTitleValueChange}
+              ></Input>
+            团课老师：<Input style={{
+                 width:"25%",
+              }}
+                value={this.state.referData.tecValue} onChange={this.teacherValueChange}
+              >
+              </Input>
+              <div style={{ float:"right"}}>
+              <Button type="primary" icon={<SearchOutlined />} style={{marginRight:'30px'}}onClick={ this.refer}>查询</Button>
+                <Button type="dashed" icon={<ReloadOutlined />}
+                  onClick={this.reset}
+                >重置</Button></div>
+            </div>
             <Table columns={columns} dataSource={ this.state.acctivityData} loading={ this.state.loading} rowKey={record => record.list} pagination={false} /> 
             <ConfigProvider locale={zhCN}>
             <Pagination

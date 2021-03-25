@@ -3,6 +3,7 @@ import Home from "./component/Home/Home/index"    //登录主页面
 // import List from './pages/admin/list/index'
 import accountManagement from './pages/admin/accountManagement/index'
 import Logging from './pages/admin/logging/index'
+import userCircularize from './pages/admin/circularize/index'
 import ChangeYear from './pages/admin/changeYear/index'
 import Notice from './pages/admin/NewsConstruction/Notice/index'
 import editNotice from './pages/admin/NewsConstruction/Notice/edit'
@@ -12,11 +13,13 @@ import Publicity from './pages/admin/NewsConstruction/publicity/index'
 import Detail from './pages/admin/NewsConstruction/publicity/details/index'
 import Information from './pages/admin/NewsConstruction/information/index'
 import TaskManagement from './pages/admin/Work/taskManagement/index'
+import editTaskManagement from './pages/admin/Work/taskManagement/edit'
 import Forum from './pages/admin/Work/forum/index'
 import QuestionnaireSurvey from './pages/admin/Work/QuestionnaireSurvey/index'
 import LeagueActivities from './pages/admin/ActivityRecord/LeagueActivities/index'
 import LeagueActivitiesEdit  from'./pages/admin/ActivityRecord/LeagueActivities/edit/index'
 import ClassInformation from './pages/admin/ActivityRecord/classInformation/index'
+import editClassInformation from './pages/admin/ActivityRecord/classInformation/edit/index'
 import pageNotFound  from './pages/pageNotFound'
 /* 路由配置 */
 export const homeRoutes = [{
@@ -40,6 +43,13 @@ export const adminRoutes = [{
         component: Logging,
         isShow: true,
         title: '日志记录', 
+        icon:"iconjilu"
+    },
+    {
+        path: '/admin/circularize',
+        component: userCircularize,
+        isShow: false,
+        title: '通知中心', 
         icon:"iconjilu"
     },
     {
@@ -106,6 +116,13 @@ export const adminRoutes = [{
         ]
     },
     {
+        path: '/admin/Work/taskManagement/edit',
+        component: editTaskManagement,
+        isShow: false,
+        title: '任务管理详情',
+        icon:"iconrenwu",
+    },
+    {
         path: '/admin/Work',
         // component: Zhanghao,
         isShow: true,
@@ -140,6 +157,13 @@ export const adminRoutes = [{
         component: LeagueActivitiesEdit,
         isShow: false,
         title: '团日活动编辑',
+        icon:"iconhuodong",
+    },
+    {
+        path: '/admin/ActivityRecord/classInformation/edit',
+        component: editClassInformation,
+        isShow: false,
+        title: '团课信息编辑',
         icon:"iconhuodong",
     },
     {

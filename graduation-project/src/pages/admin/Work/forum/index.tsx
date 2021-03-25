@@ -52,14 +52,26 @@ export default  class Main extends Component<IProps, IState>{
         }
     }
        //点赞功能
-        onLike = () => {
+    onLike = (item: any) => {
+        let addLikeData = qs.stringify({
+            id: item.id,
+            likeNum:parseInt(item.likeNum)+1
+       });  
+        let url=''
+        item.pid ? url = "http://www.test.com/forum/childrenLikeNum.php":url="http://www.test.com/forum/LikeNum.php"
+        axios.post(url, addLikeData).then((res: any) => {
+            if (res.data.code=== 200) {
+                message.success('点赞评论成功')
+                this.init()
+            }
+         })
+
             // notification.warning({
             //     message: '提示',
             //     description: '暂不支持点赞功能',
             //     duration: 3,
             //     // icon: <Icon type="smile" />,
             // })
-      console.log( Date.now());
         }
       // 展开回复的textarea
     public showReply = (item: any, pid: any) => {
@@ -79,7 +91,7 @@ export default  class Main extends Component<IProps, IState>{
         </span>,
         <span>
             <Tooltip title="赞">
-                <span onClick={this.onLike}>
+                <span onClick={()=>this.onLike(item)}>
                     <LikeTwoTone />&nbsp;赞<span>{ item.likeNum}</span>
                 </span>
             </Tooltip>
@@ -108,12 +120,11 @@ export default  class Main extends Component<IProps, IState>{
     return actions
     }
        // 删除回复
-       public onDelete = async (item:any) => {
+       public onDelete = async (item:any) => {      console.log(item);
             Modal.confirm({
                 title: '提示',
                 content: `确认删除该留言${item.children && item.children.length ? '及其底下的回复' : ''}吗？`,
                 onOk: async () => {
-                    console.log(item);
                     let deleteData = qs.stringify({
                         id:item.id
                    });  
@@ -131,8 +142,22 @@ export default  class Main extends Component<IProps, IState>{
     componentDidMount() {
         this.setState({
             root: cookie.load('root')
-          })
-        this.init()
+        }, () => {
+            let loginData = qs.stringify({
+                username: this.state.root.id,
+                password:this.state.root.password
+              });  
+               axios.post("http://www.test.com/adminuser/login.php", loginData).then((res: any) => {
+                 this.setState({
+                   root: {
+                     ...this.state.root,
+                     picture:res.data.data.data.picture
+                   }
+                 })
+             this.init()
+               })
+        })
+
     }
     public init = () => {
         axios.post("http://www.test.com/forum/select.php").then((res: any) => {   
@@ -153,7 +178,6 @@ export default  class Main extends Component<IProps, IState>{
                                         ite.children.push(i)
                                     }
                                 }  
-                               
                             })
                             return ite
                         })                 
@@ -167,7 +191,6 @@ export default  class Main extends Component<IProps, IState>{
             console.log(err); 
           })
     }
-  
     //发言讨论
     public sendMessage = () => {
         const editorState = this.state.editorState
@@ -180,8 +203,9 @@ export default  class Main extends Component<IProps, IState>{
                content: htmlContent,
                createTime: Date.now(),
                likeNum: 0,
-               userName: "小屿呀",
-               children:[],
+               userName: this.state.root.rootname,
+               children: [],
+               picture:this.state.root.picture
           });  
               axios.post("http://www.test.com/forum/submit.php",addData).then((res: any) => {
                   if (res.data.code === 200) {
@@ -232,8 +256,9 @@ export default  class Main extends Component<IProps, IState>{
             pid: this.state.replyPid,
             createTime: Date.now(),
             likeNum: 0,
-            userName: "小屿呀",
-            targetUserName: this.state.replyUser
+            userName: this.state.root.rootname,
+            targetUserName: this.state.replyUser,
+            picture:this.state.root.picture
         })
         axios.post("http://www.test.com/forum/childrenSubmit.php",childrenaddData).then((res: any) => {
             if (res.data.code === 200) {
@@ -298,11 +323,11 @@ export default  class Main extends Component<IProps, IState>{
                     <Spin spinning={loading} style={{ position: 'fixed', top: '50%', left: '50%' }} />
                     <div>
                     {
-                            Array.isArray(messages) && messages.map((item:any, index:any) => (
+                            Array.isArray(messages) && messages.map((item: any, index: any) => (
                                 <Comment
                                     key={item.id}
                                     author={<span style={{ fontSize: 16 }}>{item.userName}</span>}
-                                    avatar={<img className='avatar-img' src="http://47.99.130.140:8888/public/images/default.png" alt='avatar' />}
+                                    avatar={<img className='avatar-img' src={ item.picture?item.picture:"http://47.99.130.140:8888/public/images/default.png"} alt='avatar' />}
                                     content={<div className='info-box braft-output-content' dangerouslySetInnerHTML={createMarkup(item.content)} />}
                                     actions={this.renderActions(item, item.id)}
                                     datetime={`第${pagination.total - (pagination.current - 1) * pagination.pageSize - index}楼`}
@@ -311,12 +336,12 @@ export default  class Main extends Component<IProps, IState>{
                                         <Comment
                                             key={i.id}
                                             author={<span style={{ fontSize: 15 }}>{i.userName} 回复 {i.targetUserName}</span>}
-                                            avatar={<img className='avatar-img-small' src="http://47.99.130.140:8888/public/images/default.png" alt='avatar' />}
+                                            avatar={<img className='avatar-img-small' src={ i.picture?i.picture:"http://47.99.130.140:8888/public/images/default.png"} alt='avatar' />}
                                             content={<div className='info-box' dangerouslySetInnerHTML={createMarkup(i.content)} />}
                                             actions={this.renderActions(i, item.id)}
                                         />
                                     )) : null}
-                                    <div className='toggle-reply-box' style={{ display: item.children?(item.children.length >2 ? 'block' : 'none'):'none' }}>
+                                    <div className='toggle-reply-box' style={{ display: item.children?(item.children.length >1 ? 'block' : 'none'):'none' }}>
                                         {
                                             expandIds.includes(item.id) ? (
                                                 <span onClick={() => this.foldReply(item)}>收起全部{item.children?item.children.length:0}条回复 <UpCircleTwoTone /></span>
