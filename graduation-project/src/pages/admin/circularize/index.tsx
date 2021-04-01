@@ -1,10 +1,13 @@
+/* eslint-disable no-restricted-globals */
+/* eslint-disable jsx-a11y/anchor-has-content */
 
 import { Component } from 'react'
 import { Card, List,Button,Input, Select, message } from 'antd'
 import Modal from 'antd/lib/modal/Modal';
 import { BulbOutlined } from '@ant-design/icons';
 import qs from 'qs'
-import axios from 'axios';
+import axios from 'axios'
+import cookie from 'react-cookies'
 const { Option } = Select;
 const { TextArea } = Input;
 
@@ -17,7 +20,7 @@ interface IState {
   audit: any,
   reason: any,
   data: any[],
-  userData:any
+  userData: any,
 }
 export default  class Main extends Component<IProps, IState>{
     constructor(props: IProps) {
@@ -42,6 +45,19 @@ export default  class Main extends Component<IProps, IState>{
       }
     })
   }
+  public refer2= () => {
+    axios.post("http://www.test.com/register/select.php").then((res) => {
+      if (res.data.code === 200) {
+        this.setState({
+          data:res.data.data.data
+        }, () => {
+          let inFifteenMinutes = new Date(new Date().getTime() + 100 * 24 * 3600 * 1000);//一天
+          cookie.save('count', res.data.data.data.length, { path: '/', expires: inFifteenMinutes })
+          parent.window.location.reload()
+        })
+      }
+    })
+  }
   public audit = (item:any) => {
     this.setState({
       userData:item,
@@ -51,40 +67,52 @@ export default  class Main extends Component<IProps, IState>{
   public handleOk = () => {
     if (this.state.audit) {
       if (this.state.audit==='审核通过') {
-        this.setState({
-          isModalVisible: false
-        }, () => {
           let addData = qs.stringify({
             ...this.state.userData,
           });
-          axios.post("http://www.test.com/",this.state.userData.list).then((res: any) => {
+          let deleteData = qs.stringify({
+            list:this.state.userData.list
+          });
+          axios.post("http://www.test.com/register/delete.php", deleteData).then((res: any) => {
             if (res.data.code === 200) {
-              axios.post("http://www.test.com/", addData).then((res: any) => {
+              this.refer2()
+              axios.post("http://www.test.com/register/add.php", addData).then((res: any) => {
                 if (res.data.code === 200) {
-                  message.warning('审核操作成功')
+                  message.success('审核操作成功')
+                  this.setState({
+                    isModalVisible: false,
+                    reason: '',
+                    audit: '',
+                    userData: '',
+                  })
                 }
               })
             }
           })
-        })
       } else {
         if (this.state.reason) {
-          this.setState({
-            isModalVisible: false
-          }, () => {
             let addData = qs.stringify({
               ...this.state.userData,
               reason: this.state.reason
             });
-            axios.post("http://www.test.com/",this.state.userData.list).then((res: any) => {
-            if (res.data.code === 200) {
-              axios.post("http://www.test.com/", addData).then((res: any) => {
+            let deleteData = qs.stringify({
+              list:this.state.userData.list
+            });
+            axios.post("http://www.test.com/register/delete.php",deleteData).then((res: any) => {
+              if (res.data.code === 200) {
+              this.refer2()
+              axios.post("http://www.test.com/register/addNotUsers.php", addData).then((res: any) => {
                 if (res.data.code === 200) {
-                  message.warning('审核操作成功')
+                  message.success('审核操作成功')
+                  this.setState({
+                    isModalVisible: false,
+                    reason: '',
+                    audit: '',
+                    userData: '',
+                  })
                 }
               })
             }
-          })
           })
         } else {
           message.warning('请输入不通过审核的理由')
@@ -119,7 +147,7 @@ export default  class Main extends Component<IProps, IState>{
     ]
         return (
           <div>
-             <Card title="账号注册审核" >
+            <Card title="账号注册审核" >
  <List
       header={<div>审核账号</div>}
       bordered
@@ -144,8 +172,9 @@ export default  class Main extends Component<IProps, IState>{
                 value={item.jurisdiction}></Input></span>
                 <span style={{ color: "#d91414" }}>
               所属团支部为:<Input disabled bordered style={{ width: ((item.userSchool.length ) * 16+20) + 'px' }}
-                value={item.userSchool}></Input></span></div>
-
+                value={item.userSchool}></Input></span><span style={{ color: "#d91414" }}>
+                所在年级为:<Input disabled bordered style={{ width: ((item.userClass.length ) * 16+20) + 'px' }}
+                  value={item.userClass}></Input></span></div>
           <Button size="small" onClick={() => { this.audit(item)}}>审核</Button>
 
         </List.Item>

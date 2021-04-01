@@ -25,7 +25,6 @@ interface IState {
     expandIds: any,  //展开的id列表
     placeholder: string,  //回复的placeholder
     loading: boolean,
-    pagination: any,
     root:any,
 }
 export default  class Main extends Component<IProps, IState>{
@@ -42,13 +41,6 @@ export default  class Main extends Component<IProps, IState>{
             expandIds: [],  //展开的id列表
             placeholder: '',  //回复的placeholder
             loading: false,
-            pagination: {
-              total: 100,
-              current: 1,  //前台分页是从1开始的，后台分页是从0开始的，所以要注意一下
-              pageSize: 10,
-              showQuickJumper: true,
-              showSizeChanger: true
-            }
         }
     }
        //点赞功能
@@ -290,7 +282,7 @@ export default  class Main extends Component<IProps, IState>{
             })
           }
     render() {
-        const { isShowEditor, messages, editorState, replyPid, replyContent, expandIds, placeholder, loading, pagination } = this.state
+        const { isShowEditor, messages, editorState, replyPid, replyContent, expandIds, placeholder, loading, } = this.state
         const hooks = {
             'toggle-link': ({ href, target}:any) => {
                 const pattern = /^((ht|f)tps?):\/\/([\w-]+(\.[\w-]+)*\/?)+(\?([\w\-.,@?^=%&:/~+#]*)+)?$/
@@ -322,7 +314,7 @@ export default  class Main extends Component<IProps, IState>{
                     <Divider />
                     <Spin spinning={loading} style={{ position: 'fixed', top: '50%', left: '50%' }} />
                     <div>
-                    {
+                        {
                             Array.isArray(messages) && messages.map((item: any, index: any) => (
                                 <Comment
                                     key={item.id}
@@ -330,7 +322,7 @@ export default  class Main extends Component<IProps, IState>{
                                     avatar={<img className='avatar-img' src={ item.picture?item.picture:"http://47.99.130.140:8888/public/images/default.png"} alt='avatar' />}
                                     content={<div className='info-box braft-output-content' dangerouslySetInnerHTML={createMarkup(item.content)} />}
                                     actions={this.renderActions(item, item.id)}
-                                    datetime={`第${pagination.total - (pagination.current - 1) * pagination.pageSize - index}楼`}
+                                    datetime={`第${ index+1}楼`}
                                 >
                                     {item.children?item.children.slice(0, expandIds.includes(item.id) ? item.children.length : 1).map((i:any) => (
                                         <Comment

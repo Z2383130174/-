@@ -49,22 +49,31 @@ interface IState {
           loading: false,
           pictureData: {
             list:''
-          },
+        },
       }
    }
    componentDidMount() {
      this.setState({
        root: cookie.load('root')
      }, () => {
+       this.refer()
        this.init()
      })
    }
+   public refer = () => {
+    axios.post("http://www.test.com/register/select.php").then((res) => {
+      if (res.data.code === 200) {
+        let inFifteenMinutes = new Date(new Date().getTime() + 100 * 24 * 3600 * 1000);//一天
+        cookie.save('count',res.data.data.data.length, { path: '/',expires: inFifteenMinutes })
+      }
+    })
+  }
    public init = () => {
      let loginData = qs.stringify({
        username: this.state.root.id,
        password:this.state.root.password
-     });  
-      axios.post("http://www.test.com/adminuser/login.php", loginData).then((res: any) => {
+     }); 
+      axios.post("http://www.test.com/adminuser/selectLogin.php", loginData).then((res: any) => {
         this.setState({
           root: {
             ...this.state.root,
@@ -202,7 +211,7 @@ interface IState {
      }}><IconFont type="icon-" style={{
       fontSize: "15px",
          }} />账号注册审核
-     <Badge count={99} overflowCount={10} size="small" offset={ [20,-10]}>
+     <Badge count={cookie.load('count')} overflowCount={10} size="small" offset={ [12,-5]}>
       <a href="#" className="head-example" />
     </Badge></Menu.Item>
        <Menu.Item key="revamp" style={{
@@ -238,10 +247,10 @@ interface IState {
                   color: "#b2b264",
                 }}>
                   您好，尊敬的{root.jurisdiction}
-                  <Badge count={99} overflowCount={10} size="small" style={{
+                  <Badge count={cookie.load('count')} overflowCount={10} size="small" style={{
                     position: "absolute",
-                    right: "165px",
-                    top: "-20px",
+                    right: "158px",
+                    top: "-17px",
                   }}>
       <a href="#" className="head-example" />
     </Badge>

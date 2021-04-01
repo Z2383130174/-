@@ -1,3 +1,4 @@
+
 //用户账号管理组件
 import { Table,message,Space, Modal,Input,Select,Row,Col,Button,Pagination,ConfigProvider, Popconfirm} from 'antd';
 import React, { Component } from 'react'
@@ -7,6 +8,11 @@ import axios from 'axios'
 import qs from 'qs';
 import './index.css'
 const { Option } = Select;
+const schoolClass = {
+  初中团支部: ['初一', '初二', '初三'],
+  高中团支部: ['高一', '高二', '高三'],
+  大学团支部: ['大一', '大二', '大三','大四'],
+}
 interface IProps {
   location:any
 }
@@ -22,12 +28,22 @@ interface IState {
   list: number,
   selectedRowKeys: any,
   loading: boolean,
-  deleteData:any,
+  deleteData: any,
+  optionSchool: any,
+  schoolClass: any,
+  disabled: boolean,
+  disabled2: boolean,
 }
 export default class Login extends Component<IProps, IState>{
     constructor(props: IProps) {
         super(props)
       this.state = {
+        disabled: true,
+        disabled2: true,
+        optionSchool: [
+          '初中团支部','高中团支部','大学团支部'
+        ] ,
+        schoolClass:[],
         deleteData:[],
           selectedRowKeys: [],
           loading: false,
@@ -44,7 +60,8 @@ export default class Login extends Component<IProps, IState>{
             limit: 10,
             offset: 0,
             userSchool: '',
-            rootname:'',
+            rootname: '',
+            userClass:'',
           },
           //新增修改账号
           userData: {
@@ -52,7 +69,8 @@ export default class Login extends Component<IProps, IState>{
             password:'',
             jurisdiction: '',
             userSchool: '',
-            rootname:'',
+            rootname: '',
+            userClass:'',
           }
         }
   }
@@ -98,9 +116,9 @@ public gettable = () => {
   }
 //批量删除用户数据
 public anyDelete = () => { 
-  if (this.state.selectedRowKeys.length>0) {
+  if (this.state.selectedRowKeys.length > 0) {
     let deleteData = qs.stringify({
-      list:this.state.deleteData
+      list:[...this.state.selectedRowKeys]
     }) 
     axios.post("http://www.test.com/adminuser/anydelete.php", deleteData).then((res: any) => {
       if (res.data.code === 200) {
@@ -122,7 +140,7 @@ public anyDelete = () => {
   public addData = () => { 
   let addData = qs.stringify({
          ...this.state.userData
-  });      console.log(addData);
+  });
     axios.post("http://www.test.com/adminuser/add.php", addData).then((res: any) => {
       if (res.data.code === 200) { 
         if (res.data.msg === "新增数据成功") {
@@ -133,9 +151,11 @@ public anyDelete = () => {
               id: '',
               password: '',
               jurisdiction: '',
-              userschoo: '',
-              rootname:''
-            }
+              userschool: '',
+              rootname: '',
+              userClass:''
+            },
+            disabled2:true
           }, () => {
             this.refer()
           })
@@ -163,8 +183,10 @@ public anyDelete = () => {
             password: '',
             jurisdiction: '',
             userSchool: '',
-            rootname:''
-          }
+            rootname: '',
+            userClass:''
+          },
+          disabled2:true
         }, () => {
           this.refer()
         })
@@ -193,8 +215,10 @@ public anyDelete = () => {
             limit: 10,
             offset: 0,
             userSchool: '',
-            rootname:'',
-      }
+            rootname: '',
+            userClass:''
+      },
+      disabled:true
     }, () => {
        this.refer()
      })
@@ -249,8 +273,12 @@ public anyDelete = () => {
         id: record.id,
         password: record.password,
         jurisdiction: record.jurisdiction,
-        userSchool:record.userSchool
+        userSchool: record.userSchool,
+        rootname: record.rootname,
+        userClass:record.userClass
       },
+      schoolClass:schoolClass[record.userSchool],
+      disabled2:false,
       title: '修改账号', 
       list:record.list,
       openModal:!this.state.openModal
@@ -263,24 +291,38 @@ public anyDelete = () => {
     })
   }
    //查询账号权限触发事件
-  public referSelectchange = (value:any) => { 
+  public referSelectchange = (value: any) => {
     if (value === undefined) {
-              value=""
-    } 
+      value=''
+    }
       this.setState({
         referData: {...this.state.referData,jurisdiction:value}
-      }, () => {
-          console.log(value);
       })
 
   }
   //查询所属团支部
-  public userChange = (value: any) => { 
+  public userChange = (value: any) => {
+    if (value ===undefined) {
+      this.setState({
+        referData: { ...this.state.referData, userSchool: '',userClass:''},
+        schoolClass: [],
+        disabled:true
+         })
+    } else {
+      this.setState({
+        referData: { ...this.state.referData, userSchool: value,userClass:schoolClass[value][0]},
+        schoolClass: schoolClass[value],
+        disabled:false
+         })
+    }
+  }
+   //查询所在年级
+  public userClassChange = (value: any) => {
     if (value === undefined) {
-      value=""
-      } 
+      value=''
+    }
     this.setState({
-      referData: {...this.state.referData, userSchool:value}  
+      referData: {...this.state.referData, userClass:value}  
         })
     }
   //新增修改账号id触发事件
@@ -318,9 +360,6 @@ public anyDelete = () => {
   
   //新增修改账号权限下拉框改变
   public selectchange = (value: any) => {
-    if (value === undefined) {
-              value=""
-      } 
     this.setState({
       userData: {...this.state.userData,jurisdiction:value}
     }, () => {
@@ -329,15 +368,25 @@ public anyDelete = () => {
   }
   //新增修改账号所属组织下拉框改变
   public userselectChange = (value: any) => {
-    if (value === undefined) {
-      value=""
-      } 
-  this.setState({
-    userData: {...this.state.userData,userSchool:value}
-  }, () => {
-      console.log(this.state.userData);     
-  })
-}
+    if (value ===undefined) {
+      this.setState({
+        userData: { ...this.state.userData, userSchool: '',userClass:''},
+        schoolClass: [],
+        disabled2:true
+         })
+    } else {
+      this.setState({
+        userData: { ...this.state.userData, userSchool: value,userClass:schoolClass[value][0]},
+        schoolClass: schoolClass[value],
+        disabled2:false
+         })
+    }
+  }
+  public ClassChange = (value: any) => {
+    this.setState({
+      userData: { ...this.state.userData, userClass: value }
+    })
+  }
 
   //弹窗确定
   public handleOk = () => {
@@ -346,9 +395,13 @@ public anyDelete = () => {
       if (this.state.userData.password&&this.state.userData.password.length > 8 &&reg.test(this.state.userData.password)) {
         if (this.state.userData.rootname&&this.state.userData.rootname.length > 0) {
           if (this.state.userData.jurisdiction && this.state.userData.jurisdiction.length > 0) {
-          if (this.state.userData.userSchool && this.state.userData.userSchool.length > 0) {
-            // eslint-disable-next-line no-lone-blocks
-            { this.state.title === '新增账号' ? this.addData() : this.updateData() }
+            if (this.state.userData.userSchool && this.state.userData.userSchool.length > 0) {
+              if (this.state.userData.userClass && this.state.userData.userClass.length > 0) {
+                // eslint-disable-next-line no-lone-blocks
+                { this.state.title === '新增账号' ? this.addData() : this.updateData() }
+              } else {
+                message.warning('请选择账号所在年级');
+              }
           }else {
             message.warning('请选择账号的所属团支部');
           }
@@ -374,22 +427,19 @@ public anyDelete = () => {
         password:'',
         jurisdiction: '',
         userSchool: '',
-        rootname:''
+        rootname: '',
+        userClass:''
       },
+      disabled2:true
     })
   }
   //多选数据
   public onSelectChange = (selectedRowKeys: any) => {
     console.log('selectedRowKeys changed: ', selectedRowKeys);
     // eslint-disable-next-line array-callback-return
-  selectedRowKeys.map((item:any) => {
-               this.state.deleteData.push(item)
-  })
-   let arr1 = [...new Set(this.state.deleteData)]
-   this.setState({
-    selectedRowKeys,
-    deleteData:arr1
-  });
+          this.setState({
+            selectedRowKeys,
+          });
   };
   //清空多选数据
   public empty = () => {
@@ -409,16 +459,11 @@ public anyDelete = () => {
       marginLeft:'34px',
     }
     }
-
     const options = [
       // { label: '管理员', value: '管理员' },
       { label: '校团委', value: '校团委' },
-      {label:'基层团干部',value:'基层团干部'}
-    ]
-    const optionSchool = [
-      { label: '初中团支部', value: '初中团支部' },
-      { label: '高中团支部', value: '高中团支部' },
-      {label:'大学团支部',value:'大学团支部'}
+      { label: '基层团干部', value: '基层团干部' },
+      {label:'普通团员',value:'普通团员'}
     ]
         const columns = [
             {
@@ -444,7 +489,7 @@ public anyDelete = () => {
               title: '密码',
               dataIndex: 'password',
               align: 'center ' as 'center',
-              width:'20%',
+              width:'17%',
               render: (text: any,record:any,index:any) => (
                 <Input.Password
                   bordered={ false}
@@ -455,10 +500,10 @@ public anyDelete = () => {
             },         
             {
               title: '权限',
-              width:'15%',
+              width:'12%',
               dataIndex: 'jurisdiction',
               align:'center 'as 'center',
-              render: (text: any[]) => (
+              render: (text: any) => (
                 <span style={{
                    color:'blue'
                 }}>{ text}</span>
@@ -468,7 +513,13 @@ public anyDelete = () => {
             title: '所属团支部',
             dataIndex: 'userSchool',
             align: 'center ' as 'center',
-            width:'15%',
+            width:'12%',
+          },
+          {
+            title: '所在年级',
+            dataIndex: 'userClass',
+            align: 'center ' as 'center',
+            width:'10%',
           },
             {
               title: '操作',
@@ -494,40 +545,51 @@ public anyDelete = () => {
         ]; 
     return (
       <div className="user">
-        <Row gutter={48} style={{ marginBottom: '15px' }}>
-        <Col span={9} style={{
+        <Row gutter={ 96} style={{ marginBottom: '15px' }}>
+        <Col span={7} style={{
                   marginLeft: '79px',
                   marginBottom:"20px"
-          }}><label>账号：</label><Input value={this.state.referData.id} onChange={this.referIdChange} style={{width:'60%'}}></Input></Col>
-          <Col span={9} ><label>权限：</label><Select value={this.state.referData.jurisdiction}
+          }}><label>账号：</label><Input value={this.state.referData.id} onChange={this.referIdChange} style={{width:'80%'}}></Input></Col>
+          <Col span={7} ><label>权限：</label><Select value={this.state.referData.jurisdiction}
           allowClear   
           style={{
-          width: "60%"
+          width: "80%"
           }}
           onChange={this.referSelectchange}>
         { options.map((item:any,index:any) =>(
           <Option value={item.value} key={index }>{item.label}</Option>
          ))}
           </Select></Col>
-          <Col span={9} style={{
-            marginLeft: '79px',
+          <Col span={7} style={{
             marginBottom:"20px"
-          }}><label>姓名：</label><Input value={this.state.referData.name} onChange={this.ReferrootnameChange} style={{width:'60%'}}></Input></Col>
-        
-          <Col span={9} ><label style={{
-            marginLeft:'-42px'
-          }}>所属团支部：</label><Select value={this.state.referData.userSchool}
+          }}><label>姓名：</label><Input value={this.state.referData.name} onChange={this.ReferrootnameChange} style={{width:'80%'}}></Input></Col>
+          <Col span={9} style={{
+            marginLeft:'36px'
+          }}><label >所属团支部：</label><Select value={this.state.referData.userSchool}
           allowClear   
           style={{
-          width: "60%"
+          width: "58%"
           }}
           onChange={this.userChange}>
-        { optionSchool.map((item:any,index:any) =>(
-       <Option value={ item.value} key={index }>{item.label}</Option>
+        { this.state.optionSchool.map((item:any,index:any) =>(
+       <Option value={ item} key={index }>{item}</Option>
+         ))}
+            </Select></Col>
+            <Col span={8} style={{
+            marginLeft:'-94px'
+          }}><label >所在年级：</label><Select value={this.state.referData.userClass}
+            allowClear
+            style={{
+              width: "67%"
+            }}
+            disabled={ this.state.disabled}
+            onChange={this.userClassChange}>
+        { this.state.schoolClass.map((item:any,index:any) =>(
+       <Option value={ item} key={index }>{item}</Option>
          ))}
           </Select></Col>
-              <div style={{display:'flex',justifyContent:'flex-end'}}> 
-              <Button type="primary" icon={<SearchOutlined />} style={{marginRight:'50px'}}onClick={ this.refer}>查询</Button>
+          <div style={{marginLeft:'63px'}}>
+              <Button type="primary" icon={<SearchOutlined />} style={{marginRight:'67px'}}onClick={ this.refer}>查询</Button>
               <Button type="dashed" icon={<ReloadOutlined />}   onClick={ this.reset}>重置</Button></div>
             </Row>
         <Button type="primary" icon={ <UserAddOutlined />} style={{ float: 'right', marginBottom: '10px' }} onClick={this.add}>新增账号</Button>
@@ -546,7 +608,6 @@ public anyDelete = () => {
                 float:'right'
                 }}
           />              </ConfigProvider>  
-        
         <Popconfirm title="确认删除此项"
                      okText="Yes"
                      cancelText="No"
@@ -636,10 +697,19 @@ public anyDelete = () => {
                 allowClear
                 {...addStyle}
                 onChange={this.userselectChange}>
-              { optionSchool.map((item:any,index:any) =>(
-             <Option value={ item.value} key={ index}>{item.label}</Option>
+              { this.state.optionSchool.map((item:any,index:any) =>(
+             <Option value={item} key={index}>{item}</Option>
                ))}
-                </Select></Col>
+            </Select></Col>
+            <Col span={18} offset={3} ><label className="FormLabelStyle">所在年级：</label><Select value={this.state.userData.userClass}
+                allowClear
+              {...addStyle}
+              disabled={this.state.disabled2}
+                onChange={this.ClassChange}>
+              { this.state.schoolClass.map((item:any,index:any) =>(
+             <Option value={item} key={index}>{item}</Option>
+               ))}
+            </Select></Col>
        </Row>         
       </Modal>
             </div>

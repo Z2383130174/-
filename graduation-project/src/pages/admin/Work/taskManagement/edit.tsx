@@ -42,7 +42,7 @@ interface IState {
     secondCity: any,
     disabled: boolean,
     isser: string,
-    accepter:string,
+    accepter: string,
 }
 export default class Main extends Component<IProps, IState>{
     formRef = React.createRef<FormInstance>();
@@ -103,15 +103,28 @@ export default class Main extends Component<IProps, IState>{
     }
   //
   public isserCahange = (value: any) => {
-    this.setState({
-      isser:value,
-      secondCity: cityData[value],
-      accepter:cityData[value][0],
-      disabled:false
-    })
+    if (value === undefined) {
+      this.setState({
+        isser:'',
+        secondCity:[],
+        accepter:'',
+        disabled:false
+      })
+    } else {
+      this.setState({
+        isser:value,
+        secondCity: cityData[value],
+        accepter:cityData[value][0],
+        disabled:false
+      })
+    }
+ 
   }
   //
-  public accepterChange = (value:any)=>{
+  public accepterChange = (value: any) => {
+    if (value === undefined) {
+      value=''
+    }
     this.setState({
       accepter:value,
     })
@@ -176,13 +189,13 @@ export default class Main extends Component<IProps, IState>{
               message.warning('任务内容不能为空')
             }
           } else {
-            message.warning('请选择接收人')
+            message.warning('请选择任务接收人')
           }
         } else {
-          message.warning('请选择发布人')
+          message.warning('请选择任务发布人')
          }
       } else {
-        message.warning('请选择发布对象')
+        message.warning('请选择接受对象')
       }
        
     }
@@ -240,7 +253,7 @@ export default class Main extends Component<IProps, IState>{
             }}
       >
       </Form.Item>
-         <Select value={this.state.userSchool?this.state.userSchool:undefined}
+         <Select value={this.state.userSchool}
             placeholder="请选择任务的接收对象"
                   allowClear   
                   style={{
@@ -265,7 +278,7 @@ export default class Main extends Component<IProps, IState>{
             }}
       > 
          </Form.Item>
-         <Select value={this.state.isser?this.state.isser:undefined}
+         <Select value={this.state.isser}
             placeholder="请选择任务的发布人"
                   allowClear   
                   style={{
@@ -285,7 +298,7 @@ export default class Main extends Component<IProps, IState>{
             }}
       > 
          </Form.Item>
-         <Select value={this.state.accepter?this.state.accepter:undefined}
+         <Select value={this.state.accepter}
                       placeholder="请选择任务的接收人"
                       disabled={this.state.disabled}
                   allowClear   
