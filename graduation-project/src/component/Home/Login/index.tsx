@@ -1,3 +1,4 @@
+
 import React, { Component } from 'react';
 // import {Link} from 'react-router-dom'
 import { Form, Input, Button, Row, Col, message } from 'antd';
@@ -19,11 +20,11 @@ interface IState {
 //使用阿里云图标
 const IconFont = createFromIconfontCN({
   scriptUrl: [
-"  //at.alicdn.com/t/font_1999223_yl4n0qasc3.js"
+"//at.alicdn.com/t/font_1999223_k1aezr3mvn.js"
   ],
 });
 
-export class Login extends Component <IProps,IState>{
+ class Login extends Component <IProps,IState>{
   // private myRef:any
   constructor(props: IProps) {
     super(props)
@@ -34,22 +35,63 @@ export class Login extends Component <IProps,IState>{
     // this.myRef= React.createRef();
 }
   componentDidMount() { 
-    this.generatedCode()
+    this.clicked()
   }
   
   // 生成验证码
-  public generatedCode = () => {
-    let code = ''
-    const array = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
-    for (let i = 0; i < 4; i++) {
-      let index = Math.floor(Math.random() * 36);//随机0-35
-      code += array[index]
+  public randomRgbColor=()=>{ //随机生成RGB颜色
+    let r = Math.floor(Math.random() * 256); //随机生成256以内r值
+    let g = Math.floor(Math.random() * 256); //随机生成256以内g值
+    let b = Math.floor(Math.random() * 256); //随机生成256以内b值
+    return "rgb(" + r + "," + g + "," + b + ")"; //返回rgb(r,g,b)格式颜色
+}
+  public clicked = () => {
+    const canvas:any= document.getElementById("canvas");
+    const context = canvas.getContext("2d");
+    context.lineWidth = 0;//设置边框大写
+    canvas.width = 85;
+    canvas.height=31
+    context.clearRect(0, 0, 85, 31); 
+    context.strokeRect(0, 0, 85, 31);
+    const aCode = "A,B,C,E,F,G,H,J,K,L,M,N,P,Q,R,S,T,W,X,Y,1,2,3,4,5,6,7,8,9";
+    const aLength = aCode.split(",").length;
+    let text = '';
+    for (var i = 0; i <= 3; i++) {
+        var x = 5 + i * 20;
+        var y = 15 + Math.random() * 4;
+        var j = Math.floor(Math.random() * aLength);
+        var deg = Math.random() * 90 * Math.PI / 180;//随机弧度
+      var txt = aCode.split(",")[j];
+      text = text + txt + '' 
+        context.fillStyle = this.randomRgbColor();
+        context.font = "bold 20px 微软雅黑";
+        //修改坐标原点和旋转角度
+        context.translate(x, y);
+        context.rotate(deg);
+        context.fillText(txt, 0, 0);
+        //恢复坐标原点和旋转角度
+        context.rotate(-deg);
+        context.translate(-x, -y);
     }
     this.setState({
-      code
+      code:text
     })
-  }
- 
+    //干扰线
+    for (let i = 0; i < 8; i++) {
+        context.strokeStyle = this.randomRgbColor();
+        context.beginPath();
+        context.moveTo(Math.random() * 120, Math.random() * 40);
+        context.lineTo(Math.random() * 120, Math.random() * 40);
+        context.stroke();
+    }
+    /**绘制干扰点**/
+    for (let i = 0; i < 20; i++) {
+        context.fillStyle = this.randomRgbColor();
+        context.beginPath();
+        context.arc(Math.random() * 120, Math.random() * 40, 1, 0, 2 * Math.PI);
+        context.fill();
+    }
+}
   render() {
     const layout = {
       labelCol: { span: 6 },
@@ -61,13 +103,12 @@ export class Login extends Component <IProps,IState>{
     };
 
     const onFinish = (values: any) => {
-      console.log('Success:', values);
         let loginData = qs.stringify({
                ...values
-        });  
-      if (values['code'] !== this.state.code) {
+        });
+      if (values['code'].toLowerCase() !== this.state.code.toLowerCase()) {
         message.error('验证码输入错误');
-        this.generatedCode()
+        this.clicked()
       } else {
         axios.post("http://www.test.com/adminuser/login.php", loginData).then((res: any) => {    
           if (res.data.code === 200) {
@@ -95,7 +136,7 @@ export class Login extends Component <IProps,IState>{
             }
           } else {
             message.error('账号或密码输入错误')
-            this.generatedCode()
+            this.clicked()
           }
         }).catch((err) =>{
           console.log(err); 
@@ -113,7 +154,6 @@ export class Login extends Component <IProps,IState>{
     }
     
     return (
-   
       <div>  
         <h3>登录</h3>
         <Form
@@ -150,7 +190,7 @@ export class Login extends Component <IProps,IState>{
               marginBottom:'-3px'
             }}
           name="password"
-           rules={[{  required: true,pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/, message: '密码为8~20位，且需要同时含有数字和字母' }]}>
+           rules={[{  required: true,pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/, message: '密码为8~20位，且需包含数字和字母' }]}>
           <Input.Password prefix={<IconFont type="iconicon-test" />} placeholder="请输入您的密码"/>
       </Form.Item>
           
@@ -162,7 +202,7 @@ export class Login extends Component <IProps,IState>{
           </Form.Item>
           <Form.Item {...tailLayout} >
           <Row >
-          <Col  span={14}>
+          <Col  span={12}>
             <Form.Item
                   name="code"
                   style={{
@@ -172,9 +212,9 @@ export class Login extends Component <IProps,IState>{
             >
               <Input  prefix={<IconFont type="iconxin2" />} placeholder="请输入右侧的验证码"/>
             </Form.Item>
-          </Col>
-          <Col span={8}>
-                <span className="code" onClick={this.generatedCode}>{ this.state.code}</span>
+              </Col>
+              <Col span={10}>
+                <canvas id="canvas"  onClick={ this.clicked}></canvas>
           </Col>
         </Row>
           </Form.Item>

@@ -4,6 +4,7 @@ import { Transfer, Select,Button,ConfigProvider, message} from 'antd'
 import qs from 'qs'
 import axios from 'axios'
 import zhCN from 'antd/lib/locale/zh_CN';
+import React from 'react';
 const { Option } = Select;
 const schoolClass = {
   初中团支部: ['初一', '初二', '初三'],
@@ -85,17 +86,17 @@ export default  class Main extends Component<IProps, IState>{
   public refer = () => {
     if (this.state.userSchool) {
       if (this.state.userClass) {
-        let referData = qs.stringify({
-          userSchool: this.state.userSchool,
-          userClass: this.state.userClass
-        });
-        axios.post("http://www.test.com/changeYear/selectAny.php", referData).then((res: any) => {
-          if (res.data.code === 200) {
-            this.setState({
-              yearData: res.data.data.data
-            })
-          }
-        })
+          let referData = qs.stringify({
+            userSchool: this.state.userSchool,
+            userClass: this.state.userClass
+          });
+          axios.post("http://www.test.com/changeYear/selectAny.php", referData).then((res: any) => {
+            if (res.data.code === 200) {
+              this.setState({
+                yearData: res.data.data.data
+              })
+            }
+          })
       } else {
         message.error('请选择年级')
       }
@@ -109,25 +110,40 @@ export default  class Main extends Component<IProps, IState>{
       userClass: this.state.userClass,
       list:[...this.state.targetKeys]
     });
-    console.log(updateData);
-    
-    axios.post("http://www.test.com/changeYear/changeYear.php", updateData).then((res: any) => {
-      if (res.data.code === 200) {
-        this.setState({
-          yearData: res.data.data.data
-        })    
-      }
-    })
+    if (this.state.userSchool) {
+      if (this.state.userClass) {
+        if (this.state.targetKeys && this.state.targetKeys.length > 0) {
+          axios.post("http://www.test.com/changeYear/changeYear.php", updateData).then((res: any) => {
+            message.success('年度转接成功')
+            this.setState({
+              userClass: '',
+              userSchool: '',
+              targetKeys: [],
+              yearData:[],
+            })
+          })
+        } else {
+          message.error('请选择转接人员')
+        }
+      }else {
+    message.error('请选择年级')
+  }
+}else {
+  message.error('请选择团支部')
+}
   }
     render() {
       return (
         <div>
-          <div style={{fontFamily: "cursive", backgroundColor: "rgb(240, 226, 158)", color: "rgb(199, 148, 36)", height: "45px", fontSize: "20px", marginTop: "-24px",textAlign: "center",lineHeight: "45px", marginBottom: "30px"}}>请选择团支部以及年级进行对该年级的年度转接</div>
-          <label htmlFor="">团支部：</label>  <Select
+          <div style={{fontFamily: "cursive", backgroundColor: "rgb(240, 226, 158)", color: "rgb(3 43 58)", height: "45px", fontSize: "20px", marginTop: "-24px",textAlign: "center",lineHeight: "45px", marginBottom: "10px"}}>请选择团支部以及年级来进行选择备选转接人员</div>
+          <label htmlFor="" style={{
+            fontFamily:'cursive',
+            fontSize:'17px'
+          }}>团支部：</label>  <Select
              value={this.state.userSchool}
              allowClear   
              style={{
-               width: "15%",
+               width: "14%",
              }}
              onChange={this.schoolChange}>
            { this.state.optionSchool.map((item:any,index:any) =>(
@@ -135,13 +151,15 @@ export default  class Main extends Component<IProps, IState>{
             ))}
             </Select>
             <label htmlFor="" style={{
-              marginLeft:'50px'
+              marginLeft: '50px',
+              fontFamily:'cursive',
+              fontSize:'20px'
             }}>年级：</label> <Select
              value={this.state.userClass}
              disabled={this.state.disabled}
              allowClear   
              style={{
-             width: "15%"
+             width: "14%"
              }}
              onChange={this.classChange}>
            { this.state.schoolClass.map((item:any,index:any) =>(
@@ -154,11 +172,12 @@ export default  class Main extends Component<IProps, IState>{
               rowKey={record => record.list} 
               listStyle={{
                 width: 2500,
-                height: 485,
+                height: 475,
               }}
               style={{
-                marginTop: '30px'
+                marginTop: '10px'
               }}
+              operations={['去右边', '去左边']}
               dataSource={this.state.yearData}
               titles={['备选转接人员', '已选转接人员']}
               targetKeys={this.state.targetKeys}

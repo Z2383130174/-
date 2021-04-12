@@ -16,7 +16,7 @@ import React from 'react';
 const { RangePicker } = DatePicker;
 const IconFont = createFromIconfontCN({
     scriptUrl: [
-  "  //at.alicdn.com/t/font_1999223_yl4n0qasc3.js"
+  " //at.alicdn.com/t/font_1999223_k1aezr3mvn.js"
     ],
   });
 interface IProps {

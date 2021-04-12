@@ -1,5 +1,5 @@
 import { Component } from 'react'
-import { Radio, Checkbox, Input,Rate,Button, message} from 'antd';
+import { Radio, Checkbox, Input,Rate,Button, message,Row} from 'antd';
 import './check.css'
 import qs from 'qs';
 import axios from 'axios';
@@ -181,11 +181,11 @@ export default  class Main extends Component<IProps, IState>{
                         <div className="title"> 6.您认为学习团课有什么重要性？：</div>
                         <div className="content">
                         <Checkbox.Group style={{ width: '100%' }} onChange={this.importonChange} value={this.state.answer.five}>
-                            <Checkbox value={"学校要求，重要性一般"} style={{marginLeft:'8px'}}>学校要求，重要性一般</Checkbox>
-                            <Checkbox  value={"提高政治思想觉悟"}>提高政治思想觉悟</Checkbox>
-                            <Checkbox  value={"了解共青团时政热点"}>了解共青团时政热点</Checkbox>
-                            <Checkbox  value={"提高入党机会"}>提高入党机会</Checkbox>
-                            <Checkbox  value={"其他"}>其他</Checkbox> 
+                            <Row>    <Checkbox value={"学校要求，重要性一般"}>学校要求，重要性一般</Checkbox>  </Row>
+                            <Row>    <Checkbox  value={"提高政治思想觉悟"}>提高政治思想觉悟</Checkbox>  </Row>
+                            <Row>    <Checkbox  value={"了解共青团时政热点"}>了解共青团时政热点</Checkbox>  </Row>
+                            <Row>    <Checkbox  value={"提高入党机会"}>提高入党机会</Checkbox>  </Row>
+                            <Row>    <Checkbox  value={"其他"} >其他</Checkbox>   </Row>
                        </Checkbox.Group>
                        </div>
                     </div>

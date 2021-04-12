@@ -11,6 +11,7 @@ ReactDOM.render(
       return <Route key={route.path} {...route}/>
     })}
       <Redirect from="/" to="admin/accountManagement" />
+       {/* <Redirect from="/" to="login" /> */}
     </Switch>
   </Router>,
     document.getElementById('root')

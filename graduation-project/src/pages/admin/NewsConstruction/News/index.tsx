@@ -28,7 +28,7 @@ interface IState {
 }
 const IconFont = createFromIconfontCN({
     scriptUrl: [
-"//at.alicdn.com/t/font_1999223_dy1bdrs7sb9.js"
+"//at.alicdn.com/t/font_1999223_k1aezr3mvn.js"
     ],
   });
 export default class New extends Component<IProps, IState>{
@@ -519,7 +519,7 @@ export default class New extends Component<IProps, IState>{
                 ></Input></Col>
                                  </Row>
                                  <Row>
-                <Col span={18} offset={3}><label className="FormLabelStyle">请输入新闻关键字，多个关键字以逗号分割：</label>
+                <Col span={18} offset={3}><label className="FormLabelStyle">请输入新闻关键字，多个关键字以英文逗号分割：</label>
                   <Input
                     value={this.state.arr.keyword}
                     onChange={this.keywordChange}

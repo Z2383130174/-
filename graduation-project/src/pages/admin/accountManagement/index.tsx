@@ -1,6 +1,6 @@
 
 //用户账号管理组件
-import { Table,message,Space, Modal,Input,Select,Row,Col,Button,Pagination,ConfigProvider, Popconfirm} from 'antd';
+import { Table,message,Space, Modal,Input,Select,Row,Col,Button,Pagination,ConfigProvider, Popconfirm,Tooltip} from 'antd';
 import React, { Component } from 'react'
 import { SettingTwoTone, EditTwoTone, EyeInvisibleOutlined, EyeTwoTone,BulbOutlined,SearchOutlined,ReloadOutlined,UserAddOutlined } from '@ant-design/icons';
 import zhCN from 'antd/lib/locale/zh_CN';
@@ -40,11 +40,9 @@ export default class Login extends Component<IProps, IState>{
       this.state = {
         disabled: true,
         disabled2: true,
-        optionSchool: [
-          '初中团支部','高中团支部','大学团支部'
-        ] ,
+        optionSchool: [],
         schoolClass:[],
-        deleteData:[],
+        deleteData: [],
           selectedRowKeys: [],
           loading: false,
           total:0,
@@ -100,6 +98,22 @@ public gettable = () => {
       console.log(err); 
   })
   }
+  //获取团支部
+  public getorganization = () => {
+    axios.post("http://www.test.com/adminuser/selectOrganization.php").then((res: any) => {   
+      if (res.data.code === 200) {
+      const arr=  res.data.data.data.map((item:any) => {
+            return item.name
+      })
+        this.setState({
+          loading: false,
+          optionSchool: [...arr],
+        })
+      } 
+    }).catch((err) =>{
+      console.log(err); 
+  })
+  }
   //删除用户数据
   public deleteData = (record: any) => { 
     let deleteData = qs.stringify({
@@ -108,6 +122,21 @@ public gettable = () => {
     axios.post("http://www.test.com/adminuser/delete.php",deleteData).then((res: any) => {
       if (res.data.code === 200) { 
         message.success('删除数据成功')
+        this.refer()
+      }
+       }).catch((err) =>{
+        console.log(err); 
+    })
+  }
+  //重置用户密码
+  public resetPassword = (record :any) => {
+    let newpPassword = qs.stringify({
+      list:record.list,
+      password:'a123456789'
+    });
+    axios.post("http://www.test.com/adminuser/updateNewpassword.php",newpPassword).then((res: any) => {
+      if (res.data.code === 200) { 
+        message.success('重置密码成功')
         this.refer()
       }
        }).catch((err) =>{
@@ -203,6 +232,7 @@ public anyDelete = () => {
     }, () => { 
       setTimeout(()=>{
         this.gettable()
+        this.getorganization()
      },500)
     })
   }
@@ -263,7 +293,15 @@ public anyDelete = () => {
   public add = (() => { 
     this.setState({
       openModal: !this.state.openModal,
-      title:'新增账号'
+      title: '新增账号',
+      userData: {
+        id:'',
+        password: 'a123456789',
+        jurisdiction: '',
+        userSchool:'',
+        rootname: '',
+        userClass:''
+      },
     })
   })
    //打开修改弹窗
@@ -310,8 +348,11 @@ public anyDelete = () => {
          })
     } else {
       this.setState({
-        referData: { ...this.state.referData, userSchool: value,userClass:schoolClass[value][0]},
-        schoolClass: schoolClass[value],
+        referData: {
+          ...this.state.referData, userSchool: value,
+          userClass: schoolClass[value.slice(9,15)][0]
+        },
+        schoolClass: schoolClass[value.slice(9,15)],
         disabled:false
          })
     }
@@ -338,12 +379,12 @@ public anyDelete = () => {
     }
   }
   //新增修改账号密码触发事件
-  public passwordChange = (e: any) => { 
-    let value = e.target.value
-      this.setState({
-        userData: {...this.state.userData,password:value}
-      })
-  }
+  // public passwordChange = (e: any) => { 
+  //   let value = e.target.value
+  //     this.setState({
+  //       userData: {...this.state.userData,password:value}
+  //     })
+  // }
   //新增修改账号触发事件
   public rootnameChange= (e: any) => { 
     let value = e.target.value
@@ -376,8 +417,8 @@ public anyDelete = () => {
          })
     } else {
       this.setState({
-        userData: { ...this.state.userData, userSchool: value,userClass:schoolClass[value][0]},
-        schoolClass: schoolClass[value],
+        userData: { ...this.state.userData, userSchool: value,  userClass: schoolClass[value.slice(9,15)][0]},
+        schoolClass: schoolClass[value.slice(9,15)],
         disabled2:false
          })
     }
@@ -465,7 +506,7 @@ public anyDelete = () => {
       { label: '基层团干部', value: '基层团干部' },
       {label:'普通团员',value:'普通团员'}
     ]
-        const columns = [
+        const columns:any = [
             {
               title: '序号',
               dataIndex: 'number',
@@ -477,7 +518,7 @@ public anyDelete = () => {
               title: '账号',
               dataIndex: 'id',
               align: 'center ' as 'center',
-              width:'18%',
+              width:'15%',
           },
           {
             title: '姓名',
@@ -489,12 +530,13 @@ public anyDelete = () => {
               title: '密码',
               dataIndex: 'password',
               align: 'center ' as 'center',
-              width:'17%',
+              width:'15%',
               render: (text: any,record:any,index:any) => (
                 <Input.Password
                   bordered={ false}
                   value={text}
                   readOnly
+                  visibilityToggle={ false}
               iconRender={visible => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
              />)
             },         
@@ -513,13 +555,29 @@ public anyDelete = () => {
             title: '所属团支部',
             dataIndex: 'userSchool',
             align: 'center ' as 'center',
-            width:'12%',
+            width: '12%',
+            onCell: () => {
+              return {
+                style: {
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                  textOverflow:'ellipsis',
+                  cursor: 'pointer',
+                  maxWidth:'220px'
+                }
+              }
+             },
+            render: (text: any, record: any, index: any) => (
+              <Tooltip placement="top" title={text}>
+                { text}
+            </Tooltip >
+                  )
           },
           {
             title: '所在年级',
             dataIndex: 'userClass',
             align: 'center ' as 'center',
-            width:'10%',
+            width:'8%',
           },
             {
               title: '操作',
@@ -537,8 +595,19 @@ public anyDelete = () => {
                     onConfirm={() => {      
                       this.deleteData(record)
                     }}>
-                  <a> <SettingTwoTone />删除</a>
-                 </Popconfirm>
+                    <a> <SettingTwoTone />删除</a>
+                  </Popconfirm>
+                  <Popconfirm title="确定重置此用户密码"
+                     okText="Yes"
+                     cancelText="No"
+                    onCancel={() => {
+                      console.log("用户取消重置")
+                    }}
+                    onConfirm={() => {      
+                      this.resetPassword(record)
+                    }}>
+                    <a> <SettingTwoTone />重置密码</a>
+                  </Popconfirm>
                 </Space>
               ),
             },
@@ -668,10 +737,12 @@ public anyDelete = () => {
               <Row>
                 <Col span={18} offset={3}><label className="FormLabelStyle">密码：</label>
               <Input.Password
+                visibilityToggle={false}
+                disabled
                 className="inputPassword"
                 value={
                     this.state.userData.password}
-                    onChange={this.passwordChange}
+                    // onChange={this.passwordChange}
                     maxLength={20}
                   {...addStyle} ></Input.Password></Col>
           </Row>

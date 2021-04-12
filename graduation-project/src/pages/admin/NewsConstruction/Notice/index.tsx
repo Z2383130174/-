@@ -1,6 +1,6 @@
 import { Component } from 'react'
-import { Card, Table, Button, Space, Pagination ,Popconfirm,message,Tooltip,ConfigProvider} from 'antd'
-import { SettingTwoTone, EditTwoTone, } from '@ant-design/icons';
+import { Card, Table, Button, Space, Pagination ,Popconfirm,message,Tooltip,ConfigProvider,Input} from 'antd'
+import { SettingTwoTone, EditTwoTone, SearchOutlined,ReloadOutlined, } from '@ant-design/icons';
 import axios from 'axios'
 import zhCN from 'antd/lib/locale/zh_CN';
 import qs from 'qs'
@@ -24,6 +24,9 @@ export default  class Main extends Component<IProps, IState>{
           noticesData: [],
           pagenumber: 1,
           referData: {
+            title: '',
+            school: '',
+            userSchool:'',
             limit: 10,
             offset:0
           },
@@ -37,6 +40,47 @@ export default  class Main extends Component<IProps, IState>{
         setTimeout(() => {
           this.refer()
      },500)
+    })
+  }
+  //公告标题查询
+  public noticeTitleValueChange = (e:any) => {
+    this.setState({
+      referData: {
+        ...this.state.referData,
+        title:e.target.value
+      }
+    })
+  }
+  //公告发布单位查询
+  public SchoolChange =(e:any) => {
+    this.setState({
+      referData: {
+        ...this.state.referData,
+        school:e.target.value
+      }
+    })
+  }
+  //公告接受团支部查询
+  public userSchoolChange = (e:any) => {
+    this.setState({
+      referData: {
+        ...this.state.referData,
+        userSchool:e.target.value
+      }
+    })
+  }
+  //重置搜索
+  public reset = () => {
+    this.setState({
+      referData: {
+        title: '',
+        school: '',
+        userSchool:'',
+        limit: 10,
+        offset:0
+      }
+    }, () => {
+      this.refer()
     })
   }
   //查询数据
@@ -78,6 +122,7 @@ export default  class Main extends Component<IProps, IState>{
           loading:true,
           pagenumber: current,
           referData: {
+          ...this.state.referData,
           limit: size,
           offset:(current-1) * size
         }
@@ -88,9 +133,12 @@ export default  class Main extends Component<IProps, IState>{
   )
   }
     //打开修改弹窗
-    public openModal = (record:any) => {
+  public openModal = (record: any) => {
       this.props.history.push({ pathname: '/admin/NewsConstruction/notice/edit', data:{list:record.list,title:'修改公告发布'}})
-  } 
+  }
+  public openAudit =  (record:any) => {
+    this.props.history.push({ pathname: '/admin/NewsConstruction/notice/audit',data:{list:record.list,}})
+  }
     //删除用户数据
     public deleteData = (record: any) => { 
       let deleteData = qs.stringify({
@@ -184,14 +232,46 @@ export default  class Main extends Component<IProps, IState>{
                     <a> <SettingTwoTone />删除</a>
                  
                       </Popconfirm>
-                    <a> <SettingTwoTone />审核</a>
+                    <a  onClick={() => { this.openAudit(record) }}> <SettingTwoTone onClick={() => { this.openAudit(record) }}/>审核</a>
                 </Space>
               ),
             },
         ];
         return (
             <Card title="公告" extra={<Button type="primary" size="small" onClick={ this.add}>新增</Button>}>
-            <Table columns={columns} dataSource={ this.state.noticesData} loading={ this.state.loading} rowKey={record => record.list} pagination={false} /> 
+                <div style={{
+              marginBottom: '20px',
+              marginLeft:'40px'
+            }}>
+              公告标题： <Input style={{
+                width: "15%",
+                marginRight: '30px'
+              }}
+                value={this.state.referData.title}
+                onChange={this.noticeTitleValueChange}
+              ></Input>
+            公告接收对象：<Input style={{
+                width: "15%",
+                marginRight: '30px'
+              }}
+                value={this.state.referData.userSchool}
+                onChange={this.userSchoolChange}
+              >
+              </Input>
+              公告发布单位：<Input style={{
+                 width:"15%",
+              }}
+                value={this.state.referData.school}
+                onChange={this.SchoolChange}
+              >
+              </Input>
+              <div style={{ float:"right"}}>
+              <Button type="primary" icon={<SearchOutlined />} style={{marginRight:'30px'}}onClick={this.refer}>查询</Button>
+                <Button type="dashed" icon={<ReloadOutlined />}
+                  onClick={this.reset}
+                >重置</Button></div>
+            </div>
+            <Table columns={columns} dataSource={this.state.noticesData} loading={this.state.loading} rowKey={record => record.list} pagination={false} />
             <ConfigProvider locale={zhCN}>
             <Pagination
               total={this.state.total}

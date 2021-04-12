@@ -14,7 +14,7 @@ const { Header, Content, Sider } = Layout;
 const routes=adminRoutes.filter(route=>route.isShow)
 const IconFont = createFromIconfontCN({
   scriptUrl: [
-"//at.alicdn.com/t/font_1999223_7h8ikv213m.js"
+"//at.alicdn.com/t/font_1999223_k1aezr3mvn.js"
   ], 
 });
 
@@ -101,7 +101,6 @@ interface IState {
        if (this.state.newPassword && this.state.newPassword.length > 8 && reg.test(this.state.newPassword)) {
          if (this.state.oldPassword !== this.state.newPassword) {
           if (this.state.newPassword === this.state.againPassword) {
-              console.log(this.state.root);
               let personageData = qs.stringify({
                 ...this.state.root,
                   newPassword:this.state.newPassword
@@ -360,7 +359,7 @@ interface IState {
           <Row>
                 <Col span={18} offset={3}><label className="FormLabelStyle">姓名：</label>
               <Input
-             defaultValue={root.rootname}
+              defaultValue={root.rootname}
               style={{
                 width: "80%",
                 marginLeft:'34px',

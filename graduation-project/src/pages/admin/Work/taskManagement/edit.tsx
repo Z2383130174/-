@@ -22,7 +22,7 @@ const { RangePicker } = DatePicker;
 //使用阿里云图标
 const IconFont = createFromIconfontCN({
     scriptUrl: [
-  "  //at.alicdn.com/t/font_1999223_yl4n0qasc3.js"
+  "//at.alicdn.com/t/font_1999223_k1aezr3mvn.js"
     ],
   });
 

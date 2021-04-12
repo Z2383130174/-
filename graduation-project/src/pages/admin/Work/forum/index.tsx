@@ -97,8 +97,7 @@ export default  class Main extends Component<IProps, IState>{
         </span>
     ]
     //只有管理员或者本人才可删除
-    if (this.state.root.rootname===item.userId ||this.state.root.jurisdiction==='管理员')
-    if (this.state.root) {
+    if (this.state.root.rootname===item.userId ||this.state.root.jurisdiction==='管理员') {
         actions.splice(2, 0, (
             <span >
                 <Tooltip title="删除">
@@ -149,7 +148,6 @@ export default  class Main extends Component<IProps, IState>{
              this.init()
                })
         })
-
     }
     public init = () => {
         axios.post("http://www.test.com/forum/select.php").then((res: any) => {   
@@ -178,7 +176,6 @@ export default  class Main extends Component<IProps, IState>{
                         })
                      }
                 })
-
             } }).catch((err) =>{
             console.log(err); 
           })
@@ -261,7 +258,7 @@ export default  class Main extends Component<IProps, IState>{
          })
     }
      // 折叠回复
-    public foldReply = (item:any) => {
+    public foldReply = (item: any) => {
         const list = this.state.expandIds.slice()
         const index = list.findIndex((i:any) => i === item.id)
         list.splice(index, 1)
@@ -309,7 +306,7 @@ export default  class Main extends Component<IProps, IState>{
                             />
                                       <Button type='primary' onClick={this.sendMessage}>发表</Button>&emsp;
                                 <Button onClick={this.closeMessage}>取消</Button>
-                    </div>:<Button onClick={this.openBraftEditor}>我要讨论</Button>}
+                    </div>:<Button type='primary' onClick={this.openBraftEditor}>我也要讨论</Button>}
                 
                     <Divider />
                     <Spin spinning={loading} style={{ position: 'fixed', top: '50%', left: '50%' }} />
@@ -353,6 +350,8 @@ export default  class Main extends Component<IProps, IState>{
                             ))
                         }
                     </div>
+                    <video src='http://flv4mp4.people.com.cn/videofile7/pvmsvideo/2020/11/25/LiJia_0c39d878a3f7edffa88f544c8a4d141c_android_c.mp4' controls={true} style={{width:'500px',height:'400px',position:'fixed',zIndex:99, right: "100px", top: "295px",}}>
+</video>
                     </Card>
             </div>
         );

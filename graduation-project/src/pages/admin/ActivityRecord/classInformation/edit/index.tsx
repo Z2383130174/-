@@ -17,7 +17,7 @@ const { TextArea } = Input;
 const { RangePicker } = DatePicker;
 const IconFont = createFromIconfontCN({
     scriptUrl: [
-  "  //at.alicdn.com/t/font_1999223_yl4n0qasc3.js"
+  "  .alicdn.com/t/font_1999223_yl4n0qasc3.js"
     ],
   });
 interface IProps {

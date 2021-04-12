@@ -7,15 +7,3 @@ h3{
 .ant-form-item-explain, .ant-form-item-extra{
     text-align: left;
 }
-.code{
-    display: inline-block;
-    height: 30px;
-    width: 70px;
-    font-size: 18px;
-    line-height: 30px;
-    font-weight: bold;
-    text-align: center;
-    background: #296774;
-    color: #fff;
-    border-radius: 5px;
-}

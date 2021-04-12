@@ -1,32 +1,37 @@
-
 .checked .main .question {
-       width: 100%;
-       padding: 20px 50px 30px 150px;
+    width: 100%;
+    padding: 20px 50px 30px 150px;
 }
-.checked .main .question .title{
+
+.checked .main .question .title {
     font-size: 18px;
     font-family: fangsong;
     margin-left: -60px;
 }
-.checked .main .question .content{
+
+.checked .main .question .content {
+    width: 80%;
     font-family: cursive;
 }
-.checked .main .question .content .ant-radio-wrapper{
 
+.checked .main .question .content .ant-radio-wrapper {
     display: block;
     padding: 10px 0px;
     font-size: 20px;
 }
-.checked .main .question .ant-checkbox-wrapper{
-    display: block;   
+
+.checked .main .question .ant-checkbox-wrapper {
+    /* display: block; */
     padding: 10px 0px;
     font-size: 20px;
+
 }
 
-.checked h3{
+.checked h3 {
     text-align: center;
 }
-.checked .main{
+
+.checked .main {
     max-width: 630px;
     height: 1760px;
     background-Color: #ffffff;

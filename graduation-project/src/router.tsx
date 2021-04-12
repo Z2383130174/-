@@ -3,10 +3,15 @@ import Home from "./component/Home/Home/index"    //登录主页面
 // import List from './pages/admin/list/index'
 import accountManagement from './pages/admin/accountManagement/index'
 import Logging from './pages/admin/logging/index'
+import auditLogging from './pages/admin/logging/audit'
+import editLogging from './pages/admin/logging/edit'
+// import DataBase from './pages/admin/database/index'
+import DataBase from './pages/admin/database/editindex'  //富文本编辑器小bug
 import userCircularize from './pages/admin/circularize/index'
 import ChangeYear from './pages/admin/changeYear/index'
 import Notice from './pages/admin/NewsConstruction/Notice/index'
 import editNotice from './pages/admin/NewsConstruction/Notice/edit'
+import auditNotice from './pages/admin/NewsConstruction/Notice/audit'
 import News from './pages/admin/NewsConstruction/News/index'
 import NewsDetails from './pages/admin/NewsConstruction/News/newsDetail/index'
 import Publicity from './pages/admin/NewsConstruction/publicity/index'
@@ -33,16 +38,29 @@ export const adminRoutes = [{
     //用户账号管理组件
     path: '/admin/accountManagement',
     component: accountManagement,
-    exact:true,
     isShow: true,
     title: '用户账号管理',
     icon:"iconyonghu"
-},
+    },
     {
         path: '/admin/logging',
         component: Logging,
         isShow: true,
         title: '日志记录', 
+        icon:"iconjilu"
+    },
+    {
+        path: '/admin/logging/edit',
+        component: editLogging,
+        isShow: false,
+        title: '编辑日志记录', 
+        icon:"iconjilu"
+    },
+    {
+        path: '/admin/logging/audit',
+        component: auditLogging,
+        isShow: false,
+        title: '审核日志记录', 
         icon:"iconjilu"
     },
     {
@@ -59,6 +77,20 @@ export const adminRoutes = [{
         title: '年度转接', 
         icon:"iconziyuan"
     },
+        {
+        path: '/admin/database',
+        component: DataBase,
+        isShow: false,
+        title: '富文本编辑器小bug', 
+        icon:"iconico_Mysgl"
+    },
+    // {
+    //     path: '/admin/database',
+    //     component: DataBase,
+    //     isShow: true,
+    //     title: '数据库管理', 
+    //     icon:"iconico_Mysgl"
+    // },
     {
      path: '/admin/NewsConstruction/details',
      component: Detail,
@@ -77,6 +109,13 @@ export const adminRoutes = [{
         component: editNotice,
         isShow: false,
         title: '公告详情',
+        icon:"iconxinwen",
+    },
+    {
+        path: '/admin/NewsConstruction/notice/audit',
+        component: auditNotice,
+        isShow: false,
+        title: '审核公告',
         icon:"iconxinwen",
     },
       {

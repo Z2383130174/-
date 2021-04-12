@@ -1,5 +1,3 @@
-/* eslint-disable no-restricted-globals */
-/* eslint-disable jsx-a11y/anchor-has-content */
 
 import { Component } from 'react'
 import { Card, List,Button,Input, Select, message } from 'antd'
@@ -41,6 +39,9 @@ export default  class Main extends Component<IProps, IState>{
       if (res.data.code === 200) {
         this.setState({
           data:res.data.data.data
+        }, () => {
+          console.log(this.state.data);
+          
         })
       }
     })
@@ -53,6 +54,7 @@ export default  class Main extends Component<IProps, IState>{
         }, () => {
           let inFifteenMinutes = new Date(new Date().getTime() + 100 * 24 * 3600 * 1000);//一天
           cookie.save('count', res.data.data.data.length, { path: '/', expires: inFifteenMinutes })
+          // eslint-disable-next-line no-restricted-globals
           parent.window.location.reload()
         })
       }
@@ -165,8 +167,8 @@ export default  class Main extends Component<IProps, IState>{
               账号为:<Input disabled bordered style={{ width: ((item.id.length ) * 9+20) + 'px' }}
                 value={item.id}></Input></span>
                 <span style={{ color: "#d91414" }}>
-              密码为:<Input disabled bordered style={{ width: ((item.password.length ) * 9+20) + 'px' }}
-                value={item.password}></Input></span>
+              密码为:<Input.Password disabled bordered  visibilityToggle={false} style={{ width: ((item.password.length ) * 9) + 'px' }}
+                value={item.password}></Input.Password></span>
                 <span style={{ color: "#d91414" }}>
                 权限为:<Input disabled bordered style={{ width: ((item.jurisdiction.length ) * 16+20) + 'px' }}
                 value={item.jurisdiction}></Input></span>
@@ -174,7 +176,9 @@ export default  class Main extends Component<IProps, IState>{
               所属团支部为:<Input disabled bordered style={{ width: ((item.userSchool.length ) * 16+20) + 'px' }}
                 value={item.userSchool}></Input></span><span style={{ color: "#d91414" }}>
                 所在年级为:<Input disabled bordered style={{ width: ((item.userClass.length ) * 16+20) + 'px' }}
-                  value={item.userClass}></Input></span></div>
+                value={item.userClass}></Input>
+            </span>
+          </div>
           <Button size="small" onClick={() => { this.audit(item)}}>审核</Button>
 
         </List.Item>

@@ -10,12 +10,12 @@ export default class App extends Component{
                 <Switch>
                     {adminRoutes.map(route => (
                         route.routes ? route.routes.map((item:any) => (
-                            <Route key={item.path} path={item.path} exact={ item.exact} render={routeProps => (
+                            <Route key={item.path} path={item.path} exact render={routeProps => (
                                 <item.component {...routeProps} />
                         )         
                             }/>
                         )
-                        )     :<Route key={route.path} path={route.path} exact={ route.exact} render={routeProps => (
+                        )     :<Route key={route.path} path={route.path} exact render={routeProps => (
                                 <route.component {...routeProps} />
                         )         
                             }/>
