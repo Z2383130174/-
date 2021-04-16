@@ -110,7 +110,7 @@ public handleEditorChange = (editorState:any) => {
   public empty = () => {
     this.formRef.current!.setFieldsValue({ classTitle:'' });
     this.formRef.current!.setFieldsValue({ classTec:'' }); 
-    this.formRef.current!.setFieldsValue({ classNumber:'' });
+    this.formRef.current!.setFieldsValue({ classNumber: '' });
     this.setState({
       startTime:'',
       endTime: '',

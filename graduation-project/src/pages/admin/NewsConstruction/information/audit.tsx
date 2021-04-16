@@ -1,7 +1,7 @@
 import { Component } from 'react'
 import qs from 'qs'
 import axios from 'axios'
-import { Button, message } from 'antd'
+import { message,Button} from 'antd'
 interface IProps {
     history:any,
     location:any
@@ -13,18 +13,18 @@ interface IState {
     content: string,
     startTime: any,
     endTime: any,
-    userSchool:any,
+    userSchool:any
 }
 export default  class Main extends Component<IProps, IState>{
     constructor(props: IProps) {
         super(props)
         this.state = {
+            userSchool:'',
             title: '',
             school: '',
             startTime: '',
             endTime:'',
             content: '',
-            userSchool:''
         }
     }
     componentDidMount() { 
@@ -32,7 +32,7 @@ export default  class Main extends Component<IProps, IState>{
             let didData = qs.stringify({
                 list: this.props.location.data.list
             });
-            axios.post("http://www.test.com/notice/selectList.php", didData).then((res: any) => {
+            axios.post("http://www.test.com/information/selectList.php", didData).then((res: any) => {
                 if (res.data.code === 200) {
                     this.setState({
                         title: res.data.data.data[0].title,
@@ -53,10 +53,10 @@ export default  class Main extends Component<IProps, IState>{
             list: this.props.location.data.list,
            ...this.state
         });
-        axios.post("http://www.test.com/newsDatabase/notices.php", addData).then((res: any) => {
+        axios.post("http://www.test.com/newsDatabase/addInformation.php", addData).then((res: any) => {
             if (res.data.code === 200) {
                 message.success('添加要闻库成功')
-                this.props.history.push('/admin/NewsConstruction/notice')
+                this.props.history.push('/admin/NewsConstruction/information')
             } else {
                 message.error('添加要闻库失败，因为要闻库已有要闻')
             }
@@ -70,13 +70,12 @@ export default  class Main extends Component<IProps, IState>{
                 <div style={{
                     float:'right'
                 }}>
-                <div>公示时间：{this.state.startTime}-{this.state.endTime}</div>
+                    <div>公示时间：{this.state.startTime}-{this.state.endTime}</div>
                     <div>公示单位：{this.state.school}</div>
                     <div>  <Button type='primary' onClick={ this.audit} style={{
                     float:'right'
                 }}>审核通过</Button></div>
-                </div>
-  
+              </div>
             </div>
         );
     }

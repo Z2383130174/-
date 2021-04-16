@@ -154,7 +154,7 @@ export default  class Main extends Component<IProps, IState>{
               render: (text: any,record:any,index:any) => `${(this.state.pagenumber-1)*this.state.referData.limit+index+1}`,
             },
             {
-              title: '标题',
+              title: '团日活动标题',
               dataIndex: 'activityTitle',
               align: 'center ' as 'center',
               width: '20%',
@@ -228,7 +228,7 @@ export default  class Main extends Component<IProps, IState>{
               marginBottom: '20px',
               marginLeft:'40px'
             }}>
-              标题： <Input style={{
+              团日活动标题： <Input style={{
                 width: "25%",
                 marginRight: '150px'
               }}

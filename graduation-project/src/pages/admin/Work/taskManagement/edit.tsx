@@ -10,7 +10,6 @@ import axios from 'axios';
 import qs from 'qs';
 import BraftEditor from 'braft-editor';
 import React from 'react';
-// import './note.css'
 const provinceData = ['管理员', '校团委','基层团干部'];
 const cityData = {
   管理员: ['校团委', '基层团干部', '团员'],
@@ -43,6 +42,7 @@ interface IState {
     disabled: boolean,
     isser: string,
     accepter: string,
+    Organization:any
 }
 export default class Main extends Component<IProps, IState>{
     formRef = React.createRef<FormInstance>();
@@ -59,7 +59,8 @@ export default class Main extends Component<IProps, IState>{
             endTime: '',
             timedata: [moment(null, "YYYY年MM月DD日"), moment(null, "YYYY年MM月DD日")],
             userSchool: '',
-            cardTitle:'',
+            cardTitle: '',
+            Organization:[]
         }
     }
   componentDidMount() {
@@ -90,8 +91,23 @@ export default class Main extends Component<IProps, IState>{
                 }).catch((err) =>{
                     console.log(err); 
                 })
-        }
     }
+    this.getorganization()
+  }
+  public getorganization = () => {
+    axios.post("http://www.test.com/adminuser/selectOrganization.php").then((res: any) => {   
+      if (res.data.code === 200) {
+      const arr=  res.data.data.data.map((item:any) => {
+            return item.name
+      })
+        this.setState({
+          Organization: [...arr],
+        })
+      } 
+    }).catch((err) =>{
+      console.log(err); 
+  })
+  }
     // 内容变化
     public handleEditorChange = (editorState:any) => {
         this.setState({ editorState })
@@ -108,7 +124,7 @@ export default class Main extends Component<IProps, IState>{
         isser:'',
         secondCity:[],
         accepter:'',
-        disabled:false
+        disabled:true
       })
     } else {
       this.setState({
@@ -211,11 +227,6 @@ export default class Main extends Component<IProps, IState>{
         })
     }
   render() {
-        const options = [
-            { label: '初中团支部', value: '初中团支部' },
-            { label: '高中团支部', value: '高中团支部' },
-            {label:'大学团支部',value:'大学团支部'}
-          ]
         return (
             <div className="noticeEdit">
             <Card title={ this.state.cardTitle}>
@@ -258,10 +269,10 @@ export default class Main extends Component<IProps, IState>{
                   allowClear   
                   style={{
                       width: "80%",
-                         }}
+               }}
           onChange={this.userChange}>
-        {options.map((item:any) =>(
-       <Option value={ item.value}>{item.label}</Option>
+        {this.state.Organization.map((item:any) =>(
+       <Option value={ item}>{item}</Option>
          ))}
               </Select>
              </div>

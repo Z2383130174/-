@@ -10,7 +10,7 @@ import axios from 'axios';
 import qs from 'qs';
 import BraftEditor from 'braft-editor';
 import React from 'react';
-import './note.css'
+import './information.css'
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -31,9 +31,9 @@ interface IState {
     endTime: any,
     timedata: any,
     editorState: any,
-    userSchool: string,
-   cardTitle: string,
-   Organization:any[]
+    userSchool: string,//接收对象
+    cardTitle: string,
+    Organization: any[]
 }
 
 export default class Main extends Component<IProps, IState>{
@@ -41,7 +41,7 @@ export default class Main extends Component<IProps, IState>{
     constructor(props: IProps) {
         super(props)
       this.state = {
-        Organization:[],
+            Organization:[],
             editorState: BraftEditor.createEditorState(null),
             startTime: '',
             endTime: '',
@@ -58,7 +58,7 @@ export default class Main extends Component<IProps, IState>{
               let didData = qs.stringify({
                 list: this.props.location.data.list
                 });
-           axios.post("http://www.test.com/notice/selectList.php",didData).then((res: any) => {  
+           axios.post("http://www.test.com/information/selectList.php",didData).then((res: any) => {  
                     if (res.data.code === 200) {
                         const { title, school, startTime, endTime, userSchool,content } = res.data.data.data[0]
                       this.formRef.current!.setFieldsValue({title});
@@ -75,8 +75,9 @@ export default class Main extends Component<IProps, IState>{
                     console.log(err); 
                 })
     }
-    this.getorganization()
+         this.getorganization()
   }
+  
   public getorganization = () => {
     axios.post("http://www.test.com/adminuser/selectOrganization.php").then((res: any) => {   
       if (res.data.code === 200) {
@@ -100,10 +101,7 @@ export default class Main extends Component<IProps, IState>{
     };
     public userChange = (value:any) => {
         this.setState({
-            userSchool:value
-        }, () => {
-            console.log(this.state.userSchool);
-            
+            userSchool:value       
         })
     }
     //公示时间变化
@@ -122,7 +120,7 @@ export default class Main extends Component<IProps, IState>{
       if (this.state.userSchool) {
         if (!this.state.editorState.isEmpty()) {
           if (this.state.startTime) {
-            if (this.props.location.data.title === '新增公告发布') {
+            if (this.props.location.data.title === '新增团委信息发布') {
               let noticeData = qs.stringify({
                 ...values,
                 content: this.state.editorState.toHTML(),
@@ -131,10 +129,10 @@ export default class Main extends Component<IProps, IState>{
                 endTime: this.state.endTime,
                 userSchool:this.state.userSchool
             })
-              axios.post("http://www.test.com/notice/notices.php",noticeData).then((res: any) => {
+              axios.post("http://www.test.com/information/addInformation.php",noticeData).then((res: any) => {
                 if (res.data.code === 200) {
                   message.success('新增公告成功')
-                  this.props.history.push('/admin/NewsConstruction/notice')
+                  this.props.history.push('/admin/NewsConstruction/information')
                 }
               }).catch((err) => {
                 console.log(err);
@@ -149,10 +147,10 @@ export default class Main extends Component<IProps, IState>{
                 endTime: this.state.endTime,
                 userSchool:this.state.userSchool
             })
-              axios.post("http://www.test.com/notice/update.php",editNoticeData).then((res: any) => {
+              axios.post("http://www.test.com/information/update.php",editNoticeData).then((res: any) => {
                 if (res.data.code === 200) {
                   message.success('修改公告成功')
-                  this.props.history.push('/admin/NewsConstruction/notice')
+                  this.props.history.push('/admin/NewsConstruction/information')
                 }
               }).catch((err) => {
                 console.log(err);
@@ -165,7 +163,7 @@ export default class Main extends Component<IProps, IState>{
           message.warning('公告内容不能为空')
         }
       } else {
-        message.warning('请选择公告接收对象')
+        message.warning('请选择发布对象')
       }
        
     }
@@ -174,11 +172,11 @@ export default class Main extends Component<IProps, IState>{
       };
     //清空
   public empty = () => {
-    this.formRef.current!.setFieldsValue({ title: '' });
+    this.formRef.current!.setFieldsValue({ title:'' }); 
     this.formRef.current!.setFieldsValue({ school: '' });
     this.setState({
-            userSchool:'',
-            editorState: BraftEditor.createEditorState(null),
+           userSchool:'',
+           editorState: BraftEditor.createEditorState(null),
             startTime: '',
             endTime: '',
             timedata: [moment(null, "YYYY年MM月DD日"), moment(null, "YYYY年MM月DD日")],
@@ -187,7 +185,7 @@ export default class Main extends Component<IProps, IState>{
     
     render() {
         return (
-            <div className="noticeEdit">
+            <div className="information">
             <Card title={ this.state.cardTitle}>
               <Form 
           ref={this.formRef}
@@ -201,7 +199,7 @@ export default class Main extends Component<IProps, IState>{
                         }}>
                         <div style={{display:'inline-block',width:'45%'}}>
         <Form.Item
-            label={<p>公告标题</p>}
+            label={<p>团委信息标题</p>}
             style={{
               marginBottom: '-2px',
             }}
@@ -217,31 +215,31 @@ export default class Main extends Component<IProps, IState>{
       </div>
         <div style={{display:'inline-block',width:'45%'}}>
       <Form.Item
-            label={<p >公告接收对象</p>}
+            label={<p >团委信息接受对象</p>}
             style={{
               marginBottom: '-2px',
             }}
       >
       </Form.Item>
          <Select value={this.state.userSchool?this.state.userSchool:undefined}
-            placeholder="请选择公告的接收对象"
-            allowClear   
+            placeholder="请选择公告的接受对象"
+                  allowClear   
                   style={{
                       width: "80%",
                          }}
           onChange={this.userChange}>
-          { this.state.Organization.map((item:any,index:any) =>(
-            <Option value={item} key={ index}>{item}</Option>
+        { this.state.Organization.map((item:any,index:number) =>(
+          <Option value={item} key={ index}>{item}</Option>
          ))}
               </Select>
              </div>
            </div>
         <div style={{
-                     marginLeft:'50px'
+           marginLeft:'50px'
               }}>
       <div style={{ display: 'inline-block', width: '45%' }}>
         <Form.Item
-            label={<p>公告发布单位</p>}
+            label={<p>团委信息发布单位</p>}
             style={{
               marginBottom: '-2px',
             }}

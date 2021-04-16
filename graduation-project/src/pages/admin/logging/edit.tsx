@@ -1,6 +1,6 @@
 import { Component } from 'react'
 // import { Input, DatePicker, Button, ConfigProvider, message, Select } from 'antd'
-import { Card, Form, Input, Button, DatePicker, ConfigProvider, message,Select } from 'antd'
+import { Card, Form, Input, Button, DatePicker, ConfigProvider, message, } from 'antd'
 import { createFromIconfontCN } from '@ant-design/icons';
 import zh_CN from 'antd/lib/locale-provider/zh_CN';
 import { FormInstance } from 'antd/lib/form';
@@ -10,10 +10,7 @@ import axios from 'axios';
 import qs from 'qs';
 import BraftEditor from 'braft-editor';
 import React from 'react';
-import './note.css'
-
-const { Option } = Select;
-const { RangePicker } = DatePicker;
+import './logging.css'
 //使用阿里云图标
 const IconFont = createFromIconfontCN({
     scriptUrl: [
@@ -27,11 +24,9 @@ interface IProps {
 }
 
 interface IState {
-    startTime: any,
-    endTime: any,
+    Time: any,
     timedata: any,
     editorState: any,
-    userSchool: string,
     cardTitle:string
 }
 
@@ -41,10 +36,8 @@ export default class Main extends Component<IProps, IState>{
         super(props)
         this.state = {
             editorState: BraftEditor.createEditorState(null),
-            startTime: '',
-            endTime: '',
-            timedata: [moment(null, "YYYY年MM月DD日"), moment(null, "YYYY年MM月DD日")],
-            userSchool: '',
+            Time: '',
+            timedata: moment(null, "YYYY年MM月DD日"),
             cardTitle:'',
         }
     }
@@ -56,17 +49,16 @@ export default class Main extends Component<IProps, IState>{
               let didData = qs.stringify({
                 list: this.props.location.data.list
                 });
-           axios.post("http://www.test.com/gonggao/selectList.php",didData).then((res: any) => {  
+           axios.post("http://www.test.com/logging/selectList.php",didData).then((res: any) => {  
                     if (res.data.code === 200) {
-                        const { title, school, startTime, endTime, userSchool,content } = res.data.data.data[0]
-                      this.formRef.current!.setFieldsValue({title});
-                        this.formRef.current!.setFieldsValue({school});
+                        const { loggingType, loggingTitle, Time, loggingUser,content } = res.data.data.data[0]
+                      this.formRef.current!.setFieldsValue({loggingType});
+                      this.formRef.current!.setFieldsValue({ loggingTitle });
+                      this.formRef.current!.setFieldsValue({loggingUser});
                         this.setState({
-                            startTime,
-                            endTime,
-                            userSchool,
+                            Time,
                             editorState: BraftEditor.createEditorState(content),
-                            timedata: [moment(startTime,"YYYY年MM月DD日"), moment( endTime,"YYYY年MM月DD日")] 
+                            timedata:moment(Time,"YYYY年MM月DD日")
                         })
                     }
                 }).catch((err) =>{
@@ -81,43 +73,30 @@ export default class Main extends Component<IProps, IState>{
         
       })
     };
-    public userChange = (value:any) => {
-        this.setState({
-            userSchool:value
-        }, () => {
-            console.log(this.state.userSchool);
-            
-        })
-    }
     //公示时间变化
     public dateChange = (date: any, dateString: any) => {
         console.log(date, dateString);
         console.log(typeof (dateString));
-        console.log(dateString[0]);
+        console.log(dateString);
             this.setState({
-                startTime:dateString[0],
-                endTime:dateString[1],
-                timedata: [moment(dateString[0],"YYYY年MM月DD日"), moment( dateString[1],"YYYY年MM月DD日")]
+                Time:dateString,
+                timedata: moment(dateString,"YYYY年MM月DD日")
             })
     }
     //发布
     public onFinish =  (values: any) => {
-      if (this.state.userSchool) {
         if (!this.state.editorState.isEmpty()) {
-          if (this.state.startTime) {
-            if (this.props.location.data.title === '新增公告发布') {
+          if (this.state.Time) {
+            if (this.props.location.data.title === '新增日志') {
               let noticeData = qs.stringify({
                 ...values,
                 content: this.state.editorState.toHTML(),
-                reading: "未读",
-                startTime: this.state.startTime,
-                endTime: this.state.endTime,
-                userSchool:this.state.userSchool
+                Time: this.state.Time,
             })
-              axios.post("http://www.test.com/gonggao/notices.php",noticeData).then((res: any) => {
+              axios.post("http://www.test.com/logging/addLogging.php",noticeData).then((res: any) => {
                 if (res.data.code === 200) {
-                  message.success('新增公告成功')
-                  this.props.history.push('/admin/NewsConstruction/notice')
+                  message.success('新增日志成功')
+                  this.props.history.push('/admin/logging')
                 }
               }).catch((err) => {
                 console.log(err);
@@ -127,51 +106,42 @@ export default class Main extends Component<IProps, IState>{
                 ...values,
                 list: this.props.location.data.list,
                 content: this.state.editorState.toHTML(),
-                reading: "未读",
-                startTime: this.state.startTime,
-                endTime: this.state.endTime,
-                userSchool:this.state.userSchool
+                Time: this.state.Time,
             })
-              axios.post("http://www.test.com/gonggao/update.php",editNoticeData).then((res: any) => {
+              axios.post("http://www.test.com/logging/update.php",editNoticeData).then((res: any) => {
                 if (res.data.code === 200) {
-                  message.success('修改公告成功')
-                  this.props.history.push('/admin/NewsConstruction/notice')
+                  message.success('修改日志成功')
+                  this.props.history.push('/admin/logging')
                 }
               }).catch((err) => {
                 console.log(err);
               })
              }
           } else {
-            message.warning('请选择公告发布时间')
+            message.warning('请选择日志时间')
           }
         } else {
-          message.warning('公告内容不能为空')
+          message.warning('日志内容不能为空')
         }
-      } else {
-        message.warning('请选择发布对象')
-      }
-       
     }
     public onFinishFailed = (errorInfo: any) => {
         console.log('Failed:', errorInfo);
       };
     //清空
-    public empty = () => {
+  public empty = () => {
+    this.formRef.current!.setFieldsValue({ loggingTitle:'' });
+    this.formRef.current!.setFieldsValue({ loggingType:'' }); 
+    this.formRef.current!.setFieldsValue({ loggingUser: '' });
         this.setState({
-            startTime: '',
-            endTime: '',
-            timedata: [moment(null, "YYYY年MM月DD日"), moment(null, "YYYY年MM月DD日")],
+          Time: '',
+          timedata: moment(null, "YYYY年MM月DD日"),
+          editorState: BraftEditor.createEditorState(null),
         })
     }
     
     render() {
-        const options = [
-            { label: '初中团支部', value: '初中团支部' },
-            { label: '高中团支部', value: '高中团支部' },
-            {label:'大学团支部',value:'大学团支部'}
-          ]
         return (
-            <div className="noticeEdit">
+            <div className="logging">
             <Card title={ this.state.cardTitle}>
               <Form 
           ref={this.formRef}
@@ -185,39 +155,35 @@ export default class Main extends Component<IProps, IState>{
                         }}>
                         <div style={{display:'inline-block',width:'45%'}}>
         <Form.Item
-            label={<p>标题</p>}
+            label={<p>日志标题</p>}
             style={{
               marginBottom: '-2px',
             }}
       >
       </Form.Item>
       <Form.Item 
-            name="title"  
-            rules={[{  required: true,message: '请输入公告的标题' }]}>
+            name="loggingTitle"  
+            rules={[{  required: true,message: '请输入日志的标题' }]}>
           <Input style={{
              width:'80%'
-          }} prefix={<IconFont type="iconxin" />} placeholder="请您输入公告的标题"/>
+          }} prefix={<IconFont type="iconxin" />} placeholder="请您输入日志的标题"/>
       </Form.Item>
       </div>
-        <div style={{display:'inline-block',width:'45%'}}>
-      <Form.Item
-            label={<p >发布对象</p>}
+                  <div style={{ display: 'inline-block', width: '45%' }}>
+                  <Form.Item
+            label={<p>日志类型</p>}
             style={{
               marginBottom: '-2px',
             }}
       >
       </Form.Item>
-         <Select value={this.state.userSchool?this.state.userSchool:undefined}
-            placeholder="请选择公告的发布对象"
-                  allowClear   
-                  style={{
-                      width: "80%",
-                         }}
-          onChange={this.userChange}>
-        { options.map((item:any) =>(
-       <Option value={ item.value}>{item.label}</Option>
-         ))}
-              </Select>
+      <Form.Item 
+            name="loggingType"  
+            rules={[{  required: true,message: '请输入日志的类型' }]}>
+          <Input style={{
+             width:'80%'
+          }} prefix={<IconFont type="iconxin" />} placeholder="请您输入日志的类型"/>
+      </Form.Item>
              </div>
            </div>
         <div style={{
@@ -225,39 +191,38 @@ export default class Main extends Component<IProps, IState>{
               }}>
       <div style={{ display: 'inline-block', width: '45%' }}>
         <Form.Item
-            label={<p>发布单位</p>}
+            label={<p>发布人</p>}
             style={{
               marginBottom: '-2px',
             }}
       > 
          </Form.Item>
       <Form.Item 
-            name="school"  
-            rules={[{  required: true, message: '请输入公告的发布单位' }]}>
+            name="loggingUser"  
+            rules={[{  required: true, message: '请输入日志的发布人' }]}>
           <Input style={{
                                 width:'80%'
-                            }} prefix={<IconFont type="iconxin" />} placeholder="请输入公告的发布单位"/>
+                            }} prefix={<IconFont type="iconxin" />} placeholder="请输入日志的发布人"/>
                                 </Form.Item>   </div>
                             <div style={{ display: 'inline-block', width: '45%' }}>
           <Form.Item
-            label={<p>公示时间</p>}
+            label={<p>发布时间</p>}
             style={{
               marginBottom: '-2px',
             }}
       >
        </Form.Item>
                     <ConfigProvider locale={zh_CN}>
-                        <RangePicker style={{width:'80%' }}
+                        <DatePicker style={{width:'80%' }}
                             format="YYYY年MM月DD日"
                             onChange={this.dateChange}
-                            separator="~"
-                            value={this.state.startTime === "" || this.state.endTime === "" ? null : this.state.timedata}
+                            // separator="~"
+                            value={this.state.Time === ""  ? null : this.state.timedata}
                         />
                     </ConfigProvider>              
-
       </div>
                 </div>
-                <Form.Item label={<p>您需要在下面输入此次公告的内容</p>}
+                <Form.Item label={<p>您需要在下面输入此次日志的内容</p>}
                   style={{
                     marginBottom: '20px',   
                     marginLeft: '50px'

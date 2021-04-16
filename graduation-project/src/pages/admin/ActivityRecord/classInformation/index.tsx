@@ -1,6 +1,6 @@
 import { Component } from 'react'
 import { Card, Table, Button, Space, Pagination ,Popconfirm,message,Tooltip,ConfigProvider,Input} from 'antd'
-import { SearchOutlined,ReloadOutlined, SettingTwoTone, EditTwoTone,} from '@ant-design/icons';
+import { SearchOutlined,ReloadOutlined, SettingTwoTone, EditTwoTone} from '@ant-design/icons';
 import axios from 'axios'
 import zhCN from 'antd/lib/locale/zh_CN';
 import qs from 'qs'

@@ -24,9 +24,9 @@ export default  class Main extends Component<IProps, IState>{
           noticesData: [],
           pagenumber: 1,
           referData: {
-            title: '',
-            school: '',
-            userSchool:'',
+            loggingTitle: '',
+            loggingUser: '',
+            loggingType:'',
             limit: 10,
             offset:0
           },
@@ -43,29 +43,29 @@ export default  class Main extends Component<IProps, IState>{
     })
   }
   //公告标题查询
-  public noticeTitleValueChange = (e:any) => {
+  public titleValueChange = (e:any) => {
     this.setState({
       referData: {
         ...this.state.referData,
-        title:e.target.value
+        loggingTitle:e.target.value
       }
     })
   }
-  //公告发布单位查询
-  public SchoolChange =(e:any) => {
+  //日志类型查询
+  public TypeChange =(e:any) => {
     this.setState({
       referData: {
         ...this.state.referData,
-        school:e.target.value
+        loggingType:e.target.value
       }
     })
   }
-  //公告接受团支部查询
-  public userSchoolChange = (e:any) => {
+  //日志发布人查询
+  public userChange = (e:any) => {
     this.setState({
       referData: {
         ...this.state.referData,
-        userSchool:e.target.value
+        loggingUser:e.target.value
       }
     })
   }
@@ -73,9 +73,9 @@ export default  class Main extends Component<IProps, IState>{
   public reset = () => {
     this.setState({
       referData: {
-        title: '',
-        school: '',
-        userSchool:'',
+        loggingTitle: '',
+        loggingType: '',
+        loggingUser: '',
         limit: 10,
         offset:0
       }
@@ -88,7 +88,7 @@ export default  class Main extends Component<IProps, IState>{
     let referData = qs.stringify({
            ...this.state.referData
     });  
-    axios.post("http://www.test.com/gonggao/select.php",referData).then((res: any) => {  
+    axios.post("http://www.test.com/logging/select.php",referData).then((res: any) => {  
       if (res.data.code === 200) {
         this.setState({
           noticesData: res.data.data.data,
@@ -144,7 +144,7 @@ export default  class Main extends Component<IProps, IState>{
       let deleteData = qs.stringify({
         list: record.list
       });
-      axios.post("http://www.test.com/gonggao/delete.php",deleteData).then((res: any) => {
+      axios.post("http://www.test.com/logging/delete.php",deleteData).then((res: any) => {
         if (res.data.code === 200) { 
           message.success('删除数据成功')
           this.refer()
@@ -153,7 +153,7 @@ export default  class Main extends Component<IProps, IState>{
           console.log(err); 
       })
     }
-  //新增公告
+  //新增日志
     public add = () => {
         this.props.history.push({ pathname: '/admin/logging/edit', data: {title:'新增日志'}})
     }
@@ -167,8 +167,8 @@ export default  class Main extends Component<IProps, IState>{
               render: (text: any,record:any,index:any) => `${(this.state.pagenumber-1)*this.state.referData.limit+index+1}`,
             },
             {
-              title: '标题',
-              dataIndex: 'title',
+              title: '日志标题',
+              dataIndex: 'loggingTitle',
               align: 'center ' as 'center',
               width: '16%',
               onCell: () => {
@@ -190,26 +190,20 @@ export default  class Main extends Component<IProps, IState>{
               
             },
             {
-              title: '公告接收对象',
-              dataIndex: 'userSchool',
+              title: '日志类型',
+              dataIndex: 'loggingType',
               align: 'center ' as 'center',
               width:'15%'
             },
             {
-                title: '公告发布单位',
-                dataIndex: 'school',
+                title: '日志发布人',
+                dataIndex: 'loggingUser',
                 align: 'center ' as 'center',
                 width:'15%'
             },
-            {
-                title: '公示开始时间',
-                dataIndex: 'startTime',
-                align: 'center ' as 'center',
-                width:'15%'
-          }, 
           {
-            title: '公示结束时间',
-            dataIndex: 'endTime',
+            title: '日志发布时间',
+            dataIndex: 'Time',
             align: 'center ' as 'center',
             width:'15%'
           }, 
@@ -232,7 +226,7 @@ export default  class Main extends Component<IProps, IState>{
                     <a> <SettingTwoTone />删除</a>
                  
                       </Popconfirm>
-                    <a  onClick={() => { this.openAudit(record) }}> <SettingTwoTone onClick={() => { this.openAudit(record) }}/>审核</a>
+                    <a  onClick={() => { this.openAudit(record) }}> <SettingTwoTone onClick={() => { this.openAudit(record) }}/>查看</a>
                 </Space>
               ),
             },
@@ -244,27 +238,27 @@ export default  class Main extends Component<IProps, IState>{
               marginLeft:'40px'
             }}>
               日志标题： <Input style={{
-                width: "15%",
+                width: "18%",
                 marginRight: '30px'
               }}
-                value={this.state.referData.title}
-                onChange={this.noticeTitleValueChange}
+                value={this.state.referData.loggingTitle}
+                onChange={this.titleValueChange}
               ></Input>
-            {/* 公告接收对象：<Input style={{
-                width: "15%",
+            日志类型：<Input style={{
+                width: "18%",
                 marginRight: '30px'
               }}
-                value={this.state.referData.userSchool}
-                onChange={this.userSchoolChange}
+                value={this.state.referData.loggingType}
+                onChange={this.TypeChange}
               >
               </Input>
-              公告发布单位：<Input style={{
-                 width:"15%",
+              日志发布人：<Input style={{
+                 width:"18%",
               }}
-                value={this.state.referData.school}
-                onChange={this.SchoolChange}
+                value={this.state.referData.loggingUser}
+                onChange={this.userChange}
               >
-              </Input> */}
+              </Input>
               <div style={{ float:"right"}}>
               <Button type="primary" icon={<SearchOutlined />} style={{marginRight:'30px'}}onClick={this.refer}>查询</Button>
                 <Button type="dashed" icon={<ReloadOutlined />}

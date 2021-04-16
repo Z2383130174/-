@@ -1,5 +1,5 @@
 
-.noticeEdit p:before{
+.logging p:before{
     display: inline-block;
     margin-right: 4px;
     color: #ff4d4f;
@@ -9,6 +9,6 @@
     content: "*";
 }
     
-.noticeEdit .ant-picker-input>input {
+.logging .ant-picker-input>input {
     text-align: center;
 }

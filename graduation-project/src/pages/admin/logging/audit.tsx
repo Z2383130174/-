@@ -1,6 +1,6 @@
 import { Component } from 'react'
 import qs from 'qs'
-import  axios from 'axios'
+import axios from 'axios'
 interface IProps {
     history:any,
     location:any
@@ -8,36 +8,35 @@ interface IProps {
 
 interface IState {
     title: string,
-    school:string,
+    user:string,
     content: string,
-    startTime: any,
-    endTime: any,
+    type: any,
+    Time: any,
 }
 export default  class Main extends Component<IProps, IState>{
     constructor(props: IProps) {
         super(props)
         this.state = {
             title: '',
-            school: '',
-            startTime: '',
-            endTime:'',
+            user: '',
+            type: '',
+            Time:'',
             content: '',
         }
     }
     componentDidMount() { 
         if (this.props.location.data) {
             let didData = qs.stringify({
-                // list: this.props.location.data.list
-                list:'5'
+                list: this.props.location.data.list
             });
-            axios.post("http://www.test.com/gonggao/selectList.php", didData).then((res: any) => {
+            axios.post("http://www.test.com/logging/selectList.php", didData).then((res: any) => {
                 if (res.data.code === 200) {
                     this.setState({
-                        title: res.data.data.data[0].title,
-                        startTime:res.data.data.data[0].startTime,
-                        endTime:res.data.data.data[0].endTime,
+                        title: res.data.data.data[0].loggingTitle,
+                        type:res.data.data.data[0].loggingType,
+                        Time:res.data.data.data[0].Time,
                         content: res.data.data.data[0].content,
-                        school:res.data.data.data[0].school,
+                        user:res.data.data.data[0].loggingUser,
                     })
                 }
             }).catch((err) => {
@@ -51,10 +50,10 @@ export default  class Main extends Component<IProps, IState>{
                 <h3 style={{textAlign:'center'}}>{ this.state.title}</h3>
                 <div dangerouslySetInnerHTML={{ __html: this.state.content }} style={{lineHeight:'40px',textIndent: "2em"}} />
                 <div style={{
-                    float:'right'
+                    float:'right'                                                                                   
                 }}>
-                <div>公示时间：{this.state.startTime}-{this.state.endTime}</div>
-                <div>公示单位：{ this.state.school}</div>
+                <div>发布时间：{this.state.Time}-{this.state.Time}</div>
+                    <div>日志作者：{this.state.user}</div>
               </div>
             </div>
         );

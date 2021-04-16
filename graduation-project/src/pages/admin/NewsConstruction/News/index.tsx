@@ -293,9 +293,11 @@ export default class New extends Component<IProps, IState>{
         let AddNewsData = qs.stringify({
                  ...this.state.newsData[index]
         });
-        axios.post("http://www.test.com/news/news.php", AddNewsData).then((res: any) => {
+        axios.post("http://www.test.com/newsDatabase/news.php", AddNewsData).then((res: any) => {
             if (res.data.code === 200) {
                 message.success('添加要闻库成功')
+            } else {
+                message.error('添加要闻库失败，因为要闻库已有要闻')
             }
         })
     }
@@ -305,9 +307,11 @@ export default class New extends Component<IProps, IState>{
         });
         console.log(AddNehomesData);
         
-        axios.post("http://www.test.com/news/news.php", AddNehomesData).then((res: any) => {
+        axios.post("http://www.test.com/newsDatabase/news.php", AddNehomesData).then((res: any) => {
             if (res.data.code === 200) {
                 message.success('添加要闻库成功')
+            }else {
+                message.error('添加要闻库失败，因为要闻库已有要闻')
             }
         })
     }

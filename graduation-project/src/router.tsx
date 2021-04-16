@@ -17,6 +17,8 @@ import NewsDetails from './pages/admin/NewsConstruction/News/newsDetail/index'
 import Publicity from './pages/admin/NewsConstruction/publicity/index'
 import Detail from './pages/admin/NewsConstruction/publicity/details/index'
 import Information from './pages/admin/NewsConstruction/information/index'
+import editInformation from './pages/admin/NewsConstruction/information/edit'
+import auditInformation from './pages/admin/NewsConstruction/information/audit'
 import TaskManagement from './pages/admin/Work/taskManagement/index'
 import editTaskManagement from './pages/admin/Work/taskManagement/edit'
 import Forum from './pages/admin/Work/forum/index'
@@ -153,6 +155,19 @@ export const adminRoutes = [{
                 icon:"iconzhongyaoxinxi",
             },
         ]
+    },
+    {
+        path: '/admin/NewsConstruction/information/edit',
+        component: editInformation,
+        isShow: false,
+        title: '编辑学校团委',
+        icon:"iconrenwu",
+    },   {
+        path: '/admin/NewsConstruction/information/audit',
+        component: auditInformation,
+        isShow: false,
+        title: '审核团委信息',
+        icon:"iconrenwu",
     },
     {
         path: '/admin/Work/taskManagement/edit',

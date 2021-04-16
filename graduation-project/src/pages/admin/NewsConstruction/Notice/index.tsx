@@ -1,10 +1,10 @@
 import { Component } from 'react'
-import { Card, Table, Button, Space, Pagination ,Popconfirm,message,Tooltip,ConfigProvider,Input} from 'antd'
+import { Card, Table, Button, Space, Pagination ,Popconfirm,message,Tooltip,ConfigProvider,Input,Select} from 'antd'
 import { SettingTwoTone, EditTwoTone, SearchOutlined,ReloadOutlined, } from '@ant-design/icons';
 import axios from 'axios'
 import zhCN from 'antd/lib/locale/zh_CN';
 import qs from 'qs'
-// import { Table,message,Space, Modal,Input,Select,Row,Col,Button,Pagination,ConfigProvider} from 'antd';
+const { Option } = Select;
 interface IProps {
     history:any
 }
@@ -14,12 +14,14 @@ interface IState {
   noticesData: any,
   pagenumber: number,
   referData: any,
-  total: number
+  total: number,
+  Organization:any[]
 }
 export default  class Main extends Component<IProps, IState>{
     constructor(props: IProps) {
         super(props)
-        this.state = {
+      this.state = {
+          Organization:[],
           loading: false,
           noticesData: [],
           pagenumber: 1,
@@ -36,11 +38,26 @@ export default  class Main extends Component<IProps, IState>{
   componentDidMount() { 
     this.setState({
       loading:true
-    }, () => { 
+    }, () => {
+      this.getorganization()
         setTimeout(() => {
           this.refer()
      },500)
     })
+  }
+  public getorganization = () => {
+    axios.post("http://www.test.com/adminuser/selectOrganization.php").then((res: any) => {   
+      if (res.data.code === 200) {
+      const arr=  res.data.data.data.map((item:any) => {
+            return item.name
+      })
+        this.setState({
+          Organization: [...arr],
+        })
+      } 
+    }).catch((err) =>{
+      console.log(err); 
+  })
   }
   //公告标题查询
   public noticeTitleValueChange = (e:any) => {
@@ -61,13 +78,18 @@ export default  class Main extends Component<IProps, IState>{
     })
   }
   //公告接受团支部查询
-  public userSchoolChange = (e:any) => {
-    this.setState({
-      referData: {
-        ...this.state.referData,
-        userSchool:e.target.value
-      }
-    })
+  public userSchoolChange = (value: any) => {
+    if (value ===undefined) {
+      this.setState({
+        referData: { ...this.state.referData, userSchool: '',},
+         })
+    } else {
+      this.setState({
+        referData: {
+          ...this.state.referData, userSchool: value,
+        },
+         })
+    }
   }
   //重置搜索
   public reset = () => {
@@ -88,7 +110,7 @@ export default  class Main extends Component<IProps, IState>{
     let referData = qs.stringify({
            ...this.state.referData
     });  
-    axios.post("http://www.test.com/gonggao/select.php",referData).then((res: any) => {  
+    axios.post("http://www.test.com/notice/select.php",referData).then((res: any) => {  
       if (res.data.code === 200) {
         this.setState({
           noticesData: res.data.data.data,
@@ -144,7 +166,7 @@ export default  class Main extends Component<IProps, IState>{
       let deleteData = qs.stringify({
         list: record.list
       });
-      axios.post("http://www.test.com/gonggao/delete.php",deleteData).then((res: any) => {
+      axios.post("http://www.test.com/notice/delete.php",deleteData).then((res: any) => {
         if (res.data.code === 200) { 
           message.success('删除数据成功')
           this.refer()
@@ -167,7 +189,7 @@ export default  class Main extends Component<IProps, IState>{
               render: (text: any,record:any,index:any) => `${(this.state.pagenumber-1)*this.state.referData.limit+index+1}`,
             },
             {
-              title: '标题',
+              title: '公告标题',
               dataIndex: 'title',
               align: 'center ' as 'center',
               width: '16%',
@@ -250,14 +272,17 @@ export default  class Main extends Component<IProps, IState>{
                 value={this.state.referData.title}
                 onChange={this.noticeTitleValueChange}
               ></Input>
-            公告接收对象：<Input style={{
+            公告接收对象：<Select style={{ 
                 width: "15%",
                 marginRight: '30px'
               }}
+              allowClear
                 value={this.state.referData.userSchool}
                 onChange={this.userSchoolChange}
-              >
-              </Input>
+              >   { this.state.Organization.map((item:any,index:any) =>(
+                <Option value={item} key={ index}>{item}</Option>
+             ))}
+              </Select>
               公告发布单位：<Input style={{
                  width:"15%",
               }}

@@ -8,11 +8,6 @@ import axios from 'axios'
 import qs from 'qs';
 import './index.css'
 const { Option } = Select;
-const schoolClass = {
-  初中团支部: ['初一', '初二', '初三'],
-  高中团支部: ['高一', '高二', '高三'],
-  大学团支部: ['大一', '大二', '大三','大四'],
-}
 interface IProps {
   location:any
 }
@@ -40,8 +35,8 @@ export default class Login extends Component<IProps, IState>{
       this.state = {
         disabled: true,
         disabled2: true,
-        optionSchool: [],
-        schoolClass:[],
+        optionSchool: [],                            //所有团支部
+        schoolClass: ['大一','大二','大三','大四'],    //所属年级
         deleteData: [],
           selectedRowKeys: [],
           loading: false,
@@ -66,9 +61,9 @@ export default class Login extends Component<IProps, IState>{
             id: '',
             password:'',
             jurisdiction: '',
-            userSchool: '',
+            userSchool: '',       //所属团支部
             rootname: '',
-            userClass:'',
+            userClass:'',         //所在年级
           }
         }
   }
@@ -315,7 +310,6 @@ public anyDelete = () => {
         rootname: record.rootname,
         userClass:record.userClass
       },
-      schoolClass:schoolClass[record.userSchool],
       disabled2:false,
       title: '修改账号', 
       list:record.list,
@@ -343,16 +337,14 @@ public anyDelete = () => {
     if (value ===undefined) {
       this.setState({
         referData: { ...this.state.referData, userSchool: '',userClass:''},
-        schoolClass: [],
         disabled:true
          })
     } else {
       this.setState({
         referData: {
           ...this.state.referData, userSchool: value,
-          userClass: schoolClass[value.slice(9,15)][0]
+          userClass: '大一'
         },
-        schoolClass: schoolClass[value.slice(9,15)],
         disabled:false
          })
     }
@@ -412,13 +404,11 @@ public anyDelete = () => {
     if (value ===undefined) {
       this.setState({
         userData: { ...this.state.userData, userSchool: '',userClass:''},
-        schoolClass: [],
         disabled2:true
          })
     } else {
       this.setState({
-        userData: { ...this.state.userData, userSchool: value,  userClass: schoolClass[value.slice(9,15)][0]},
-        schoolClass: schoolClass[value.slice(9,15)],
+        userData: { ...this.state.userData, userSchool: value,  userClass: '大一'},
         disabled2:false
          })
     }

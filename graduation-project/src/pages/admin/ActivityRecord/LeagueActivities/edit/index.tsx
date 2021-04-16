@@ -356,7 +356,7 @@ public handleEditorChange = (editorState:any) => {
         }}>
          <div style={{display:'inline-block',width:'45%'}}>
         <Form.Item
-            label={<p>标题</p>}
+            label={<p>团日活动标题</p>}
             style={{
               marginBottom: '-2px',
             }}
